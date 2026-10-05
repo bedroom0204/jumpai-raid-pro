@@ -1,0 +1,18 @@
+{
+  "name": "JumpAI Raid Pro — AI 即時跳繩怪獸討伐",
+  "short_name": "JumpAI Raid",
+  "description": "AI 即時跳繩計數、防誤判辨識與多人怪獸討伐系統",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#060A12",
+  "theme_color": "#B4FF39",
+  "icons": [
+    {
+      "src": "./icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

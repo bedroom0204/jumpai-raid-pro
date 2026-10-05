@@ -1,0 +1,20 @@
+{
+  "name": "jumpai-raid-pro",
+  "version": "1.0.0",
+  "description": "JumpAI Raid Pro — AI 即時跳繩計數、防誤判辨識與多人怪獸討伐系統",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8080",
+    "deploy": "npx vercel --prod"
+  },
+  "keywords": [
+    "jump-rope",
+    "mediapipe",
+    "ai-vision",
+    "gamification",
+    "fitness",
+    "pwa"
+  ],
+  "author": "JumpAI Team",
+  "license": "MIT"
+}
