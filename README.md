@@ -2,10 +2,14 @@
 
 > 科技賦能體能訓練・AI 視覺偵測・防走路誤判・7 日怪獸討伐戰・100 成就圖鑑・PWA 支援
 
+[![GitHub Pages](https://img.shields.io/badge/Demo-GitHub%20Pages-brightgreen?logo=github)](https://bedroom0204.github.io/jumpai-raid-pro/)
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 ![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)
 ![PWA Ready](https://img.shields.io/badge/PWA-Ready-cyan.svg)
 ![MediaPipe Pose](https://img.shields.io/badge/AI-MediaPipe%20Pose-lime.svg)
+
+🌐 **線上即開即用 Demo**：👉 **[https://bedroom0204.github.io/jumpai-raid-pro/](https://bedroom0204.github.io/jumpai-raid-pro/)**
+*(支援手機、平板與筆電鏡頭跳繩偵測與 PWA 加入主畫面)*
 
 ---
 
