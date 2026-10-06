@@ -130,87 +130,56 @@
 </head>
 <body class="min-h-screen flex flex-col selection:bg-neon-lime selection:text-slate-950">
 
-    <header class="sticky top-0 z-30 glass-panel border-b border-slate-800/80 px-3 sm:px-6 py-2.5">
-        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2.5">
+        <!-- MINIMALIST CYBERPUNK HEADER -->
+    <header class="sticky top-0 z-30 glass-panel border-b border-slate-800/80 px-3 sm:px-6 py-2">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-2">
             <!-- Brand Title & AI Status -->
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-2xl bg-neon-lime/15 border border-neon-lime/40 flex items-center justify-center text-neon-lime neon-glow-lime">
-                    <i class="ph-bold ph-sword text-2xl"></i>
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-neon-lime/15 border border-neon-lime/40 flex items-center justify-center text-neon-lime neon-glow-lime shrink-0">
+                    <i class="ph-bold ph-sword text-xl"></i>
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
-                        <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-white">JumpAI <span class="text-neon-lime">RAID PRO</span></h1>
-                        <span id="aiStatusBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                        <h1 class="text-sm sm:text-base font-extrabold tracking-tight text-white">JumpAI <span class="text-neon-lime">RAID PRO</span></h1>
+                        <span id="aiStatusBadge" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                             <span id="aiStatusDot" class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span id="aiStatusText">AI 模擬引擎就緒</span>
+                            <span id="aiStatusText">AI 就緒</span>
                         </span>
                     </div>
-                    <p class="text-[11px] text-slate-400 hidden sm:block">三階段標準流程・防走路誤判・多人臉部建檔・每日怪獸討伐・Cookies 備份</p>
                 </div>
             </div>
 
-            <!-- Source Switcher & Quick Modals -->
-            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                <div class="inline-flex p-1 rounded-xl bg-surface-900 border border-slate-800">
-                    <button id="btnModeWebcam" onclick="switchInputSource('webcam')" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white">
-                        <i class="ph-bold ph-webcam text-sm text-neon-cyan"></i>
-                        <span>開啟鏡頭</span>
-                    </button>
-                    <button id="btnModeSim" onclick="switchInputSource('sim')" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all bg-neon-lime text-slate-950 shadow">
-                        <i class="ph-bold ph-person-simple-run text-sm"></i>
-                        <span>AI 模擬模式</span>
-                    </button>
-                    <label class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white cursor-pointer">
-                        <i class="ph-bold ph-upload-simple text-sm text-amber-400"></i>
-                        <span class="hidden md:inline">上傳影片</span>
-                        <input id="videoUploadInput" type="file" accept="video/*" class="hidden" onchange="handleVideoUpload(event)">
-                    </label>
-                </div>
-
-                <!-- Flip Camera Button -->
-                <button id="btnFlipCamera" onclick="flipCamera()" class="hidden items-center gap-1 px-2.5 py-1.5 rounded-xl bg-surface-800 hover:bg-surface-700 border border-slate-700 text-xs font-medium text-slate-200 transition" title="切換前後鏡頭">
-                    <i class="ph-bold ph-camera-rotate text-base text-neon-cyan"></i>
+            <!-- Source Switcher (Webcam / Sim / Flip) -->
+            <div class="inline-flex p-1 rounded-xl bg-surface-900 border border-slate-800 shrink-0">
+                <button id="btnModeWebcam" onclick="switchInputSource('webcam')" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white">
+                    <i class="ph-bold ph-webcam text-sm text-neon-cyan"></i>
+                    <span>鏡頭模式</span>
                 </button>
-
-                <!-- Cookies & Export / Import Backup Button -->
-                <button onclick="openCookieBackupModal()" class="px-2.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-1.5 transition" title="管理瀏覽器 Cookies 紀錄、匯出與匯入備份檔">
-                    <i class="ph-fill ph-cookie text-base text-neon-lime"></i>
-                    <span>Cookies 紀錄與匯出</span>
+                <button id="btnModeSim" onclick="switchInputSource('sim')" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all bg-neon-lime text-slate-950 shadow">
+                    <i class="ph-bold ph-person-simple-run text-sm"></i>
+                    <span>模擬模式</span>
                 </button>
-
-                <!-- Yesterday Report Button -->
-                <button onclick="openYesterdayModal()" class="px-2.5 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-bold flex items-center gap-1.5 transition">
-                    <i class="ph-fill ph-scroll text-base"></i>
-                    <span>昨日戰報</span>
+                <button id="btnFlipCamera" onclick="flipCamera()" class="hidden items-center gap-1 px-2 py-1 rounded-lg bg-surface-800 hover:bg-surface-700 border border-slate-700 text-xs font-medium text-slate-200 transition" title="切換前後鏡頭">
+                    <i class="ph-bold ph-camera-rotate text-sm text-neon-cyan"></i>
                 </button>
+            </div>
 
-                <!-- 100 Achievements Modal Button -->
-                <button onclick="openAchievementsModal()" class="px-2.5 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/40 text-purple-300 text-xs font-bold flex items-center gap-1.5 transition">
-                    <i class="ph-fill ph-trophy text-base text-amber-400"></i>
-                    <span>成就圖鑑 (<b id="navAchCount">0</b>/100)</span>
-                </button>
-
-                <!-- Sound Toggle -->
-                                <!-- Screen Wake Lock Toggle -->
-                <button id="btnWakeLock" onclick="toggleWakeLock()" class="px-2 sm:px-2.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-1 transition" title="螢幕常亮防休眠保護 (運動中螢幕不變暗)">
+            <!-- Quick Controls: Voice, Sound, WakeLock, Fullscreen, Menu -->
+            <div class="flex items-center gap-1.5 sm:gap-2">
+                <!-- Screen Wake Lock Toggle -->
+                <button id="btnWakeLock" onclick="toggleWakeLock()" class="px-2.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-1 transition" title="螢幕常亮防休眠保護">
                     <i id="iconWakeLock" class="ph-fill ph-sun text-base text-neon-lime"></i>
-                    <span id="textWakeLock" class="hidden xl:inline">螢幕常亮</span>
+                    <span id="textWakeLock" class="hidden md:inline">常亮</span>
                 </button>
 
                 <!-- Voice Narration Toggle (Web Speech API) -->
-                <button id="btnVoiceToggle" onclick="toggleVoice()" class="p-2 rounded-xl bg-surface-800 hover:bg-surface-700 border border-slate-700 text-neon-cyan transition" title="切換語音即時報數與激勵 (Web Speech API)">
+                <button id="btnVoiceToggle" onclick="toggleVoice()" class="p-2 rounded-xl bg-surface-800 hover:bg-surface-700 border border-slate-700 text-neon-cyan transition" title="切換語音即時報數與激勵 (V鍵)">
                     <i id="iconVoice" class="ph-fill ph-waveform text-base"></i>
                 </button>
 
                 <!-- Sound Toggle -->
-                <button id="btnSoundToggle" onclick="toggleSound()" class="p-2 rounded-xl bg-surface-800 hover:bg-surface-700 border border-slate-700 text-neon-lime transition" title="切換音效">
+                <button id="btnSoundToggle" onclick="toggleSound()" class="p-2 rounded-xl bg-surface-800 hover:bg-surface-700 border border-slate-700 text-neon-lime transition" title="切換音效 (M鍵)">
                     <i id="iconSound" class="ph-bold ph-speaker-high text-base"></i>
-                </button>
-
-                <!-- Share Workout Card Modal Button -->
-                <button onclick="openShareReportModal()" class="px-2.5 py-1.5 rounded-xl bg-neon-cyan/15 hover:bg-neon-cyan/25 border border-neon-cyan/40 text-neon-cyan text-xs font-bold flex items-center gap-1 transition" title="生成今日戰報成效分享卡片 (PNG/複製)">
-                    <i class="ph-bold ph-share-network text-base"></i>
-                    <span class="hidden sm:inline">戰報卡片</span>
                 </button>
 
                 <!-- Fullscreen Toggle -->
@@ -218,522 +187,546 @@
                     <i id="iconFullscreen" class="ph-bold ph-arrows-out text-base"></i>
                 </button>
 
-                <!-- Shortcuts Cheat Sheet Button -->
-                <button onclick="openShortcutsModal()" class="p-2 rounded-xl bg-surface-800 hover:bg-surface-700 border border-slate-700 text-slate-400 hover:text-white transition" title="快捷鍵說明 (?鍵)">
-                    <i class="ph-bold ph-keyboard text-base"></i>
+                <!-- More Functions Modal Button -->
+                <button onclick="openMoreMenuModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-800 hover:bg-surface-700 border border-slate-700 text-xs font-bold text-slate-200 transition shadow" title="功能選單與數據中心">
+                    <i class="ph-bold ph-dots-nine text-base text-amber-400"></i>
+                    <span class="hidden sm:inline">功能選單</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <section class="max-w-7xl w-full mx-auto px-3 sm:px-5 pt-3">
-        <div class="glass-panel rounded-2xl p-2.5 sm:p-3 border border-slate-800/90 flex flex-wrap items-center justify-between gap-2.5">
-            <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                <!-- Step 1 Pill -->
-                <button id="stepBtn1" onclick="enterStage(1)" class="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all border">
-                    <span class="w-5 h-5 rounded-full flex items-center justify-center font-mono text-[11px] bg-black/30">1</span>
-                    <i class="ph-fill ph-camera-plus text-sm"></i>
-                    <span>步驟 1：設定參戰人物與拍照</span>
-                </button>
-                <i class="ph-bold ph-caret-right text-slate-600 text-xs hidden sm:inline"></i>
-
-                <!-- Step 2 Pill -->
-                <button id="stepBtn2" onclick="enterStage(2)" class="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all border">
-                    <span class="w-5 h-5 rounded-full flex items-center justify-center font-mono text-[11px] bg-black/30">2</span>
-                    <i class="ph-fill ph-bounding-box text-sm"></i>
-                    <span>步驟 2：定位與試跳測試 (<b id="step2JumpBadge">0/3</b>)</span>
-                </button>
-                <i class="ph-bold ph-caret-right text-slate-600 text-xs hidden sm:inline"></i>
-
-                <!-- Step 3 Pill -->
-                <button id="stepBtn3" onclick="enterStage(3)" class="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all border">
-                    <span class="w-5 h-5 rounded-full flex items-center justify-center font-mono text-[11px] bg-black/30">3</span>
-                    <i class="ph-fill ph-sword text-sm"></i>
-                    <span>步驟 3：怪獸登場・正式討伐</span>
+    <!-- COMPACT FIGHTER & WORKOUT BAR (Slim 40px strip) -->
+    <div class="max-w-7xl w-full mx-auto px-3 sm:px-6 pt-2">
+        <div class="glass-panel rounded-2xl px-3 py-1.5 border border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
+            <!-- Left: Current Fighter Quick Selection -->
+            <div class="flex items-center gap-2 flex-wrap">
+                <div class="flex items-center gap-1.5">
+                    <img id="activeUserHeaderAvatar" src="https://placehold.co/40x40/1E293B/B4FF39?text=U" alt="頭像" class="w-6 h-6 rounded-full object-cover border border-neon-lime">
+                    <span id="activeUserHeaderName" class="font-extrabold text-xs text-white">阿傑</span>
+                </div>
+                <div class="h-3.5 w-px bg-slate-800 hidden sm:block"></div>
+                <!-- Fighter Pills Container -->
+                <div id="participantPillsContainer" class="flex items-center gap-1.5 flex-wrap">
+                    <!-- Populated dynamically -->
+                </div>
+                <button onclick="openFaceRegisterModal('new')" class="px-2 py-0.5 rounded-lg bg-neon-cyan/15 hover:bg-neon-cyan/25 border border-neon-cyan/40 text-neon-cyan text-[11px] font-bold flex items-center gap-1 transition" title="新增參戰人物拍照">
+                    <i class="ph-bold ph-camera-plus"></i>
+                    <span class="hidden sm:inline">新增拍照</span>
                 </button>
             </div>
 
-            <!-- Cookie Sync Live Status -->
-            <div class="flex items-center gap-2 text-[11px] font-mono">
-                <span id="cookieSyncBadge" class="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 flex items-center gap-1.5">
+            <!-- Right: Stage Pills & Live Stats Summary -->
+            <div class="flex items-center gap-2 sm:gap-3 text-xs flex-wrap">
+                <!-- User Stats -->
+                <div class="flex items-center gap-2 text-[11px] text-slate-300">
+                    <span>今日：<b id="userDailyJumpsText" class="font-mono text-neon-lime">0</b></span>
+                    <span class="hidden md:inline">本週：<b id="userWeeklyJumpsText" class="font-mono text-neon-cyan">0</b></span>
+                    <span class="hidden md:inline">總計：<b id="userTotalJumpsText" class="font-mono text-amber-400">0</b></span>
+                </div>
+                <div class="h-3.5 w-px bg-slate-800 hidden sm:block"></div>
+                <!-- Stage 1 / 2 / 3 Pills -->
+                <div class="flex items-center gap-1 text-[11px]">
+                    <button id="stepBtn1" onclick="enterStage(1)" class="px-2 py-0.5 rounded-lg font-bold border transition">
+                        <span>1.人物</span>
+                    </button>
+                    <button id="stepBtn2" onclick="enterStage(2)" class="px-2 py-0.5 rounded-lg font-bold border transition">
+                        <span>2.試跳 (<b id="step2JumpBadge">0/3</b>)</span>
+                    </button>
+                    <button id="stepBtn3" onclick="enterStage(3)" class="px-2 py-0.5 rounded-lg font-bold border transition">
+                        <span>3.討伐</span>
+                    </button>
+                </div>
+                <!-- Cookie Sync live badge -->
+                <span id="cookieSyncBadge" class="hidden lg:flex px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[10px] font-mono items-center gap-1" title="Cookies 自動備份">
                     <i class="ph-fill ph-cookie text-neon-lime"></i>
-                    <span id="cookieStatusShortText">Cookies 已自動同步</span>
+                    <span id="cookieStatusShortText">已同步</span>
                 </span>
-                <button onclick="openCookieBackupModal()" class="px-2.5 py-1 rounded-lg bg-surface-800 hover:bg-surface-700 text-neon-cyan border border-slate-700 font-sans font-bold transition">
-                    匯出 / 匯入紀錄
-                </button>
             </div>
         </div>
-    </section>
+    </div>
 
-    <section class="max-w-7xl w-full mx-auto px-3 sm:px-5 pt-2.5">
-        <div class="glass-panel rounded-2xl p-3 border border-slate-800/90 flex flex-wrap items-center justify-between gap-3">
-            <!-- Active Participant & Face Switcher -->
-            <div class="flex items-center gap-2.5 flex-wrap">
-                <div class="flex items-center gap-1.5 text-xs font-bold text-slate-300 mr-1">
-                    <i class="ph-fill ph-identification-badge text-neon-cyan text-lg"></i>
-                    <span>當前參戰人物：</span>
-                </div>
-                <div id="participantPillsContainer" class="flex items-center gap-2 flex-wrap">
-                    <!-- Dynamically populated participant pills with face avatars -->
-                </div>
-                <button onclick="openStage1WizardModal()" class="px-3 py-1.5 rounded-xl bg-neon-lime/15 hover:bg-neon-lime/25 border border-neon-lime/50 text-neon-lime text-xs font-extrabold flex items-center gap-1.5 transition">
-                    <i class="ph-bold ph-users-three text-sm"></i>
-                    <span>參戰人物設定工坊 (拍照/管理)</span>
-                </button>
-                <button onclick="openFaceRegisterModal('new')" class="px-2.5 py-1.5 rounded-xl bg-neon-cyan/15 hover:bg-neon-cyan/25 border border-neon-cyan/40 text-neon-cyan text-xs font-bold flex items-center gap-1 transition">
-                    <i class="ph-bold ph-camera-plus text-sm"></i>
-                    <span>+ 快速新增拍照</span>
-                </button>
-            </div>
+    <!-- MAIN GAMEPLAY ARENA: FOCUSED ON 1. LIVE VISION, 2. MONSTER RAID, 3. GIANT COUNTER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 flex flex-col gap-4">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
 
-            <!-- Active User Quick Cumulative Summary -->
-            <div class="flex items-center gap-2 sm:gap-4 text-xs bg-surface-950/80 px-3.5 py-2 rounded-xl border border-slate-800/80">
-                <div class="flex items-center gap-2">
-                    <img id="activeUserHeaderAvatar" src="https://placehold.co/40x40/1E293B/B4FF39?text=U" alt="臉部頭像" class="w-7 h-7 rounded-full object-cover border border-neon-lime">
-                    <span id="activeUserHeaderName" class="font-bold text-white">阿傑</span>
-                    <button onclick="openFaceRegisterModal('update')" class="text-[11px] text-neon-cyan hover:underline">更新臉部快照</button>
-                </div>
-                <div class="h-4 w-px bg-slate-800"></div>
-                <div>今日：<b id="userDailyJumpsText" class="font-mono text-neon-lime">0</b> 下</div>
-                <div>本週：<b id="userWeeklyJumpsText" class="font-mono text-neon-cyan">0</b> 下</div>
-                <div>總累計：<b id="userTotalJumpsText" class="font-mono text-amber-400">0</b> 下</div>
-                <button onclick="openLeaderboardModal()" class="px-2 py-1 rounded-lg bg-surface-800 hover:bg-surface-700 text-slate-200 font-semibold border border-slate-700">
-                    全員統計表
-                </button>
-            </div>
-        </div>
-    </section>
+            <!-- LEFT: REAL-TIME AI VISION VIEWPORT (7 cols on lg) -->
+            <div class="lg:col-span-7 flex flex-col">
+                <div class="relative rounded-3xl overflow-hidden glass-panel border border-slate-700/80 shadow-2xl aspect-video sm:aspect-[4/3] lg:aspect-auto lg:h-full min-h-[340px] sm:min-h-[460px] bg-surface-950 flex items-center justify-center">
+                    <video id="rawVideo" class="hidden" playsinline muted></video>
+                    <canvas id="visionCanvas" class="w-full h-full block object-cover"></canvas>
 
-    <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
-
-        <!-- LEFT COLUMN: Vision Viewport + Anti-Walk Biomechanical Monitor + Waveform (7 cols) -->
-        <div class="lg:col-span-7 flex flex-col gap-4">
-
-            <!-- Video & Skeleton Canvas Card -->
-            <div class="relative rounded-2xl overflow-hidden glass-panel border border-slate-800 shadow-2xl aspect-video bg-surface-950 flex items-center justify-center">
-                <video id="rawVideo" class="hidden" playsinline muted></video>
-                <canvas id="visionCanvas" class="w-full h-full block object-cover"></canvas>
-
-                <!-- Top-Left HUD Overlay -->
-                <div class="absolute top-3 left-3 flex flex-wrap items-center gap-2 pointer-events-none">
-                    <div class="px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-md border border-white/10 text-[11px] font-mono text-slate-300 flex items-center gap-1.5">
-                        <i class="ph-fill ph-Lightning text-neon-lime"></i>
-                        <span id="fpsCounter">60 FPS</span>
-                    </div>
-                    <div id="poseStateChip" class="px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-md border border-white/10 text-[11px] font-mono text-neon-cyan">
-                        狀態: 地面待機 (GROUNDED)
-                    </div>
-                    <!-- Face Verified Tag -->
-                    <div class="px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-md border border-emerald-500/40 text-[11px] font-mono text-emerald-300 flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                        <span id="hudFaceVerifiedText">臉部已鎖定：阿傑</span>
-                    </div>
-                </div>
-
-                <!-- Top-Right HUD Overlay: Jump Height & Anti-Walk Warning -->
-                <div class="absolute top-3 right-3 flex flex-col items-end gap-1.5 pointer-events-none">
-                    <div class="px-3 py-1 rounded-lg bg-black/75 backdrop-blur-md border border-white/10 text-xs font-mono text-white">
-                        離地正規化高度: <span id="hudJumpHeight" class="text-neon-lime font-bold">0.0%</span>
-                    </div>
-                    <div id="antiWalkWarningBadge" class="hidden px-3 py-1 rounded-full bg-rose-500/90 border border-rose-300 text-white font-extrabold text-xs tracking-wide shadow-lg animate-bounce">
-                        🚫 偵測到走路/橫移 (已攔截誤判)
-                    </div>
-                </div>
-
-                <!-- STAGE 2 CALIBRATION HUD BANNER OVERLAY (Shown on Video Canvas during Stage 2) -->
-                <div id="stage2CanvasOverlay" class="hidden absolute top-14 inset-x-4 z-10 pointer-events-none flex flex-col items-center">
-                    <div class="px-4 py-2 rounded-2xl bg-black/85 backdrop-blur-md border-2 border-neon-cyan shadow-2xl text-center max-w-md">
-                        <div class="text-[11px] font-mono uppercase tracking-widest text-neon-cyan font-extrabold">
-                            STAGE 2・鏡頭全身定位與試跳測試環節
+                    <!-- Top-Left HUD: FPS & Pose State -->
+                    <div class="absolute top-3 left-3 flex flex-wrap items-center gap-2 pointer-events-none z-10">
+                        <div class="px-2.5 py-1 rounded-xl bg-black/80 backdrop-blur-md border border-white/10 text-[11px] font-mono text-slate-300 flex items-center gap-1.5 shadow">
+                            <i class="ph-fill ph-lightning text-neon-lime"></i>
+                            <span id="fpsCounter">60 FPS</span>
                         </div>
-                        <p id="stage2GuideInstruction" class="text-xs sm:text-sm font-extrabold text-white mt-0.5">
-                            請站在畫面中央綠色定位框內，並完成 3 下試跳測試 (0 / 3)
+                        <div id="poseStateChip" class="px-2.5 py-1 rounded-xl bg-black/80 backdrop-blur-md border border-white/10 text-[11px] font-mono text-neon-cyan shadow">
+                            狀態: 地面待機 (GROUNDED)
+                        </div>
+                        <div class="hidden sm:flex px-2.5 py-1 rounded-xl bg-black/80 backdrop-blur-md border border-emerald-500/40 text-[11px] font-mono text-emerald-300 items-center gap-1.5 shadow">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                            <span id="hudFaceVerifiedText">臉部已鎖定：阿傑</span>
+                        </div>
+                    </div>
+
+                    <!-- Top-Right HUD: Jump Height & Anti-Walk Alert -->
+                    <div class="absolute top-3 right-3 flex flex-col items-end gap-1.5 pointer-events-none z-10">
+                        <div class="px-3 py-1 rounded-xl bg-black/80 backdrop-blur-md border border-white/10 text-xs font-mono text-white shadow">
+                            離地: <span id="hudJumpHeight" class="text-neon-lime font-black">0.0%</span>
+                        </div>
+                        <div id="antiWalkWarningBadge" class="hidden px-3.5 py-1.5 rounded-full bg-rose-600 border-2 border-rose-300 text-white font-black text-xs tracking-wide shadow-2xl animate-bounce">
+                            🚫 偵測到走路/橫移 (已攔截誤判)
+                        </div>
+                    </div>
+
+                    <!-- Stage 2 Calibration In-Canvas HUD Overlay -->
+                    <div id="stage2CanvasOverlay" class="hidden absolute top-14 inset-x-4 z-10 pointer-events-none flex flex-col items-center">
+                        <div class="px-4 py-2 rounded-2xl bg-black/85 backdrop-blur-md border-2 border-neon-cyan shadow-2xl text-center max-w-md">
+                            <div class="text-[11px] font-mono uppercase tracking-widest text-neon-cyan font-extrabold">
+                                STAGE 2・鏡頭全身定位與試跳測試環節
+                            </div>
+                            <p id="stage2GuideInstruction" class="text-xs sm:text-sm font-extrabold text-white mt-0.5">
+                                請站在畫面中央綠色定位框內，並完成 3 下試跳測試 (0 / 3)
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Monster Appearance Fanfare Overlay -->
+                    <div id="monsterSummonOverlay" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-30 flex flex-col items-center justify-center text-center p-6">
+                        <div class="w-20 h-20 rounded-3xl bg-rose-500/20 border-2 border-rose-500 flex items-center justify-center text-4xl mb-3 animate-bounce">
+                            👾
+                        </div>
+                        <span class="px-3 py-1 rounded-full bg-neon-lime/20 border border-neon-lime text-neon-lime font-mono text-xs font-extrabold">
+                            ✅ 定位與試跳測試通過！
+                        </span>
+                        <h3 class="text-2xl sm:text-4xl font-black text-white mt-2 tracking-tight">
+                            今日怪獸正式登場！開始討伐！
+                        </h3>
+                        <p id="monsterSummonSubtext" class="text-sm text-rose-300 font-bold mt-1">
+                            目標：暗影跳跳史萊姆 (500 HP)
                         </p>
                     </div>
-                </div>
 
-                <!-- MONSTER APPEARANCE FANFARE OVERLAY (Transition from Stage 2 -> Stage 3) -->
-                <div id="monsterSummonOverlay" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-30 flex flex-col items-center justify-center text-center p-6">
-                    <div class="w-20 h-20 rounded-3xl bg-rose-500/20 border-2 border-rose-500 flex items-center justify-center text-4xl mb-3 animate-bounce">
-                        👾
+                    <!-- 3-Second Countdown Overlay -->
+                    <div id="countdownOverlay" class="hidden absolute inset-0 bg-black/85 backdrop-blur-md z-20 flex flex-col items-center justify-center text-center p-6">
+                        <img id="countdownFacePreview" src="https://placehold.co/80x80/1E293B/B4FF39?text=U" class="w-16 h-16 rounded-full border-2 border-neon-lime mb-2 object-cover">
+                        <span id="countdownUserTitle" class="text-xs uppercase tracking-widest text-neon-cyan font-mono mb-1">參戰者臉部確認完畢</span>
+                        <div id="countdownNumber" class="text-7xl sm:text-8xl font-black font-mono text-neon-lime animate-pulse">3</div>
+                        <p class="text-xs text-slate-300 mt-3">請保持全身入鏡，雙腳同時起跳才計入有效次數</p>
                     </div>
-                    <span class="px-3 py-1 rounded-full bg-neon-lime/20 border border-neon-lime text-neon-lime font-mono text-xs font-extrabold">
-                        ✅ 定位與試跳測試通過！
-                    </span>
-                    <h3 class="text-2xl sm:text-4xl font-black text-white mt-2 tracking-tight">
-                        今日怪獸正式登場！開始討伐！
-                    </h3>
-                    <p id="monsterSummonSubtext" class="text-sm text-rose-300 font-bold mt-1">
-                        目標：暗影跳跳史萊姆 (500 HP)
-                    </p>
-                </div>
 
-                <!-- 3-Second Countdown & Face Check Overlay -->
-                <div id="countdownOverlay" class="hidden absolute inset-0 bg-black/80 backdrop-blur-md z-20 flex flex-col items-center justify-center text-center p-6">
-                    <img id="countdownFacePreview" src="https://placehold.co/80x80/1E293B/B4FF39?text=U" class="w-16 h-16 rounded-full border-2 border-neon-lime mb-2 object-cover">
-                    <span id="countdownUserTitle" class="text-xs uppercase tracking-widest text-neon-cyan font-mono mb-1">參戰者臉部確認完畢</span>
-                    <div id="countdownNumber" class="text-7xl sm:text-8xl font-black font-mono text-neon-lime">3</div>
-                    <p class="text-xs text-slate-300 mt-3">請保持全身入鏡，雙腳同時起跳才計入有效次數</p>
-                </div>
-
-                <!-- Simulation Mode Controls Bar -->
-                <div id="simControlBanner" class="absolute bottom-3 inset-x-3 flex flex-wrap items-center justify-between gap-2 px-3 py-2 rounded-xl bg-black/85 backdrop-blur-md border border-slate-700/80 text-xs">
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                        <span class="text-slate-400 font-semibold mr-1">動作模擬驗證：</span>
-                        <button id="btnSimBehaviorJump" onclick="setSimBehavior('jump')" class="px-2.5 py-1 rounded-lg bg-neon-lime text-slate-950 font-bold transition">
-                            🏃 正常跳繩
-                        </button>
-                        <button id="btnSimBehaviorWalk" onclick="setSimBehavior('walk')" class="px-2.5 py-1 rounded-lg bg-surface-800 hover:bg-surface-700 text-rose-300 border border-rose-500/30 font-semibold transition" title="測試走路移動時不會被誤判為跳繩">
-                            🚶 模擬走路移動 (防誤判測試)
-                        </button>
-                        <button id="btnSimBehaviorStep" onclick="setSimBehavior('step')" class="px-2.5 py-1 rounded-lg bg-surface-800 hover:bg-surface-700 text-amber-300 border border-amber-500/30 font-semibold transition" title="測試單腳交替踏步不會被誤判">
-                            🦵 模擬原地踏步 (防誤判測試)
-                        </button>
-                    </div>
-                    <div class="flex items-center gap-2 ml-auto">
-                        <span class="text-slate-400">模擬轉速</span>
-                        <input id="simRpmSlider" type="range" min="70" max="190" value="130" class="w-20" oninput="updateSimRpm(this.value)">
-                        <span id="simRpmValue" class="font-mono text-neon-lime font-bold w-14">130 RPM</span>
-                        <button onclick="triggerManualSimJump()" class="px-2 py-1 rounded-lg bg-surface-800 hover:bg-surface-700 text-white border border-slate-600 font-medium">
-                            手動跳+1
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ANTI-WALK & GAIT DISCRIMINATION MONITOR (Requirement 1) -->
-            <div class="glass-panel rounded-2xl p-4 border border-slate-800">
-                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                    <div class="flex items-center gap-2">
-                        <i class="ph-fill ph-shield-check text-neon-cyan text-lg"></i>
-                        <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-200">AI 防走路 / 移動誤判生物力學監視器 (Anti-Walk Gait Filter)</h2>
-                    </div>
-                    <div class="flex items-center gap-2 text-xs">
-                        <span class="text-slate-400">已成功攔截非跳繩晃動：</span>
-                        <span id="rejectedMotionCounter" class="px-2 py-0.5 rounded-md bg-rose-500/20 border border-rose-500/40 text-rose-300 font-mono font-bold">0 次</span>
-                    </div>
-                </div>
-
-                <!-- 4 Biomechanical Verification Gates -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
-                    <div id="gateCardHorizontal" class="p-2.5 rounded-xl bg-surface-900/90 border border-emerald-500/30 flex flex-col justify-between">
-                        <div class="flex items-center justify-between text-slate-400 text-[11px]">
-                            <span>① 水平位移穩定度</span>
-                            <span id="gateIconHorizontal" class="text-emerald-400 font-bold">通過</span>
+                    <!-- Simulation Controls Bar (Docked at canvas bottom) -->
+                    <div id="simControlBanner" class="absolute bottom-3 inset-x-3 flex flex-wrap items-center justify-between gap-2 px-3 py-2 rounded-2xl bg-black/90 backdrop-blur-md border border-slate-700/80 text-xs z-10">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="text-slate-400 font-semibold mr-1">動作模擬：</span>
+                            <button id="btnSimBehaviorJump" onclick="setSimBehavior('jump')" class="px-2.5 py-1 rounded-xl bg-neon-lime text-slate-950 font-extrabold transition">
+                                🏃 跳繩
+                            </button>
+                            <button id="btnSimBehaviorWalk" onclick="setSimBehavior('walk')" class="px-2.5 py-1 rounded-xl bg-surface-800 hover:bg-surface-700 text-rose-300 border border-rose-500/30 font-semibold transition" title="模擬走路 (防誤判測試)">
+                                🚶 走路
+                            </button>
+                            <button id="btnSimBehaviorStep" onclick="setSimBehavior('step')" class="px-2.5 py-1 rounded-xl bg-surface-800 hover:bg-surface-700 text-amber-300 border border-amber-500/30 font-semibold transition" title="模擬踏步 (防誤判測試)">
+                                🦵 踏步
+                            </button>
                         </div>
-                        <div class="mt-1 flex items-baseline justify-between">
-                            <span id="gateValueHorizontal" class="font-mono font-bold text-white">1.2%</span>
-                            <span class="text-[10px] text-slate-500">上限 &lt;14%/s</span>
-                        </div>
-                    </div>
-
-                    <div id="gateCardSync" class="p-2.5 rounded-xl bg-surface-900/90 border border-emerald-500/30 flex flex-col justify-between">
-                        <div class="flex items-center justify-between text-slate-400 text-[11px]">
-                            <span>② 雙腳同步起跳率</span>
-                            <span id="gateIconSync" class="text-emerald-400 font-bold">通過</span>
-                        </div>
-                        <div class="mt-1 flex items-baseline justify-between">
-                            <span id="gateValueSync" class="font-mono font-bold text-white">98%</span>
-                            <span class="text-[10px] text-slate-500">排除單腳踏步</span>
-                        </div>
-                    </div>
-
-                    <div id="gateCardWrist" class="p-2.5 rounded-xl bg-surface-900/90 border border-emerald-500/30 flex flex-col justify-between">
-                        <div class="flex items-center justify-between text-slate-400 text-[11px]">
-                            <span>③ 雙手搖繩姿態</span>
-                            <span id="gateIconWrist" class="text-emerald-400 font-bold">通過</span>
-                        </div>
-                        <div class="mt-1 flex items-baseline justify-between">
-                            <span id="gateValueWrist" class="font-mono font-bold text-white">對稱護腰</span>
-                            <span class="text-[10px] text-slate-500">排除大幅擺臂</span>
-                        </div>
-                    </div>
-
-                    <div id="gateCardAirtime" class="p-2.5 rounded-xl bg-surface-900/90 border border-emerald-500/30 flex flex-col justify-between">
-                        <div class="flex items-center justify-between text-slate-400 text-[11px]">
-                            <span>④ 滯空彈跳週期</span>
-                            <span id="gateIconAirtime" class="text-emerald-400 font-bold">通過</span>
-                        </div>
-                        <div class="mt-1 flex items-baseline justify-between">
-                            <span id="gateValueAirtime" class="font-mono font-bold text-white">210 ms</span>
-                            <span class="text-[10px] text-slate-500">110~680ms</span>
+                        <div class="flex items-center gap-2 ml-auto">
+                            <input id="simRpmSlider" type="range" min="70" max="190" value="130" class="w-16 sm:w-20" oninput="updateSimRpm(this.value)">
+                            <span id="simRpmValue" class="font-mono text-neon-lime font-bold w-14">130 RPM</span>
+                            <button onclick="triggerManualSimJump()" class="px-2.5 py-1 rounded-xl bg-surface-800 hover:bg-surface-700 text-white border border-slate-600 font-bold">
+                                試跳+1
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Real-Time Vertical Displacement Waveform Graph -->
-            <div class="glass-panel rounded-2xl p-4 border border-slate-800">
-                <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                    <div class="flex items-center gap-2">
-                        <i class="ph-bold ph-wave-sine text-neon-cyan text-lg"></i>
-                        <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-300">即時垂直位移與波峰偵測圖 (Normalized ΔY)</h2>
+            <!-- RIGHT: DEDICATED TO 1. 打怪 (MONSTER RAID), 2. 跳繩計次 (GIANT HERO COUNTER) (5 cols on lg) -->
+            <div class="lg:col-span-5 flex flex-col gap-4 justify-between">
+
+                <!-- STAGE 2 CALIBRATION CARD (Only active in Stage 2) -->
+                <div id="stage2CalibrationCard" class="hidden glass-panel rounded-3xl p-5 border-2 border-neon-cyan/60 relative overflow-hidden shadow-2xl">
+                    <div class="flex items-center justify-between gap-2 mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-1 rounded-lg bg-neon-cyan/20 border border-neon-cyan/50 text-neon-cyan font-mono font-extrabold text-xs">
+                                STEP 2・定位測試
+                            </span>
+                            <h2 class="text-base font-black text-white">開戰前鏡頭定位與試跳</h2>
+                        </div>
+                        <span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[11px] font-bold">
+                            🔒 怪獸等待登場
+                        </span>
                     </div>
-                    <div class="flex items-center gap-3 text-[11px] font-mono">
-                        <span class="flex items-center gap-1 text-neon-cyan"><span class="w-2.5 h-0.5 bg-neon-cyan inline-block"></span> 垂直軌跡</span>
-                        <span class="flex items-center gap-1 text-neon-lime"><span class="w-2.5 h-0.5 bg-neon-lime inline-block"></span> 起跳門檻線</span>
-                        <span class="flex items-center gap-1 text-rose-400"><span class="w-2 h-2 rounded-full bg-rose-500 inline-block"></span> 有效波峰</span>
+                    <div class="space-y-2.5 bg-surface-950/90 p-3 rounded-2xl border border-slate-800 text-xs">
+                        <div class="flex items-center justify-between p-2 rounded-xl bg-surface-900 border border-slate-800">
+                            <div class="flex items-center gap-2">
+                                <div id="calIconFraming" class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">✓</div>
+                                <span class="font-bold text-white">① 全身入鏡與站位檢測</span>
+                            </div>
+                            <span id="calBadgeFraming" class="font-mono font-bold text-emerald-400">已對準</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded-xl bg-surface-900 border border-slate-800">
+                            <div class="flex items-center gap-2">
+                                <div id="calIconBaseline" class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">✓</div>
+                                <span class="font-bold text-white">② 地面基準線鎖定</span>
+                            </div>
+                            <button onclick="recalibrateBaseline(); showToast('已重新校準地面基準線！');" class="px-2 py-0.5 rounded bg-surface-800 text-neon-cyan font-bold border border-slate-700 text-[11px]">
+                                重新鎖定
+                            </button>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-surface-900 border border-neon-lime/40">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="font-bold text-white">③ 試跳進度 (需 3 下有效跳躍)</span>
+                                <span id="calTestJumpCounterText" class="font-mono font-black text-neon-lime">0 / 3 下</span>
+                            </div>
+                            <div class="w-full h-2.5 rounded-full bg-surface-950 border border-slate-800 overflow-hidden">
+                                <div id="calTestJumpBar" class="h-full rounded-full bg-neon-lime transition-all duration-200" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div id="calTextFraming" class="hidden"></div>
+                        <div id="calTextBaseline" class="hidden"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-4">
+                        <button onclick="openStage1WizardModal()" class="py-2.5 px-3 rounded-xl bg-surface-800 hover:bg-surface-700 text-slate-300 font-bold text-xs border border-slate-700">
+                            修改參戰人物
+                        </button>
+                        <button onclick="completeCalibrationAndSummonMonster()" class="py-2.5 px-3 rounded-xl bg-neon-lime text-slate-950 font-black text-xs hover:brightness-110 shadow-lg shadow-neon-lime/20">
+                            召喚怪獸開戰！
+                        </button>
                     </div>
                 </div>
-                <div class="h-28 sm:h-32 w-full bg-surface-950/90 rounded-xl border border-slate-800/80 overflow-hidden relative">
-                    <canvas id="waveformCanvas" class="w-full h-full block"></canvas>
+
+                <!-- 1. 打怪：MONSTER RAID ARENA (Stage 3 Gameplay) -->
+                <div id="monsterRaidCard" class="glass-panel rounded-3xl p-4 sm:p-5 border border-rose-500/30 shadow-2xl relative overflow-hidden flex-1 flex flex-col justify-between">
+                    <!-- Boss Header -->
+                    <div class="flex items-center justify-between gap-2 mb-2.5">
+                        <div class="flex items-center gap-2">
+                            <span id="monsterTierBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-black tracking-wide bg-rose-500/25 text-rose-300 border border-rose-500/40">
+                                DAY 1・每日怪獸
+                            </span>
+                            <h2 id="monsterNameTitle" class="text-base sm:text-lg font-black text-white">暗影跳跳史萊姆</h2>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="cycleRaidDay(-1)" class="p-1 rounded-lg bg-surface-800 hover:bg-surface-700 text-slate-300 text-xs" title="前一天怪獸">
+                                <i class="ph-bold ph-caret-left"></i>
+                            </button>
+                            <span id="raidDayIndicator" class="font-mono text-xs text-slate-300 px-1 font-bold">第 1 / 7 天</span>
+                            <button onclick="cycleRaidDay(1)" class="p-1 rounded-lg bg-surface-800 hover:bg-surface-700 text-slate-300 text-xs" title="下一天怪獸">
+                                <i class="ph-bold ph-caret-right"></i>
+                            </button>
+                            <button onclick="openMonsterConfigModal()" class="ml-1 p-1 rounded-lg bg-surface-800 hover:bg-surface-700 text-neon-cyan border border-slate-700 text-xs" title="調整血量目標">
+                                <i class="ph-bold ph-sliders"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Monster Avatar & Dynamic Battle HP Bar -->
+                    <div class="grid grid-cols-12 gap-3 items-center bg-surface-950/90 p-3 sm:p-4 rounded-2xl border border-slate-800/90 shadow-inner">
+                        <!-- Left: Animated SVG Monster -->
+                        <div class="col-span-5 sm:col-span-4 flex flex-col items-center justify-center relative">
+                            <div id="monsterDamageFloat" class="hidden absolute -top-3 right-0 font-mono font-black text-base text-neon-lime drop-shadow-[0_0_10px_rgba(180,255,57,0.8)] animate-bounce z-20">
+                                -1 HP!
+                            </div>
+                            <div id="monsterSvgContainer" class="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center animate-monster-float transition-transform">
+                                <!-- Dynamically injected SVG Monster -->
+                            </div>
+                            <span id="monsterStatusLabel" class="text-[11px] font-mono text-rose-400 font-extrabold mt-1 text-center">🔥 戰鬥進行中</span>
+                        </div>
+
+                        <!-- Right: Glowing HP Bar & Numbers -->
+                        <div class="col-span-7 sm:col-span-8 flex flex-col gap-2">
+                            <div class="flex items-baseline justify-between">
+                                <span class="text-xs font-bold text-slate-400">怪獸剩餘生命 (HP)</span>
+                                <div class="font-mono font-black">
+                                    <span id="monsterHpCurrent" class="text-rose-400 text-xl sm:text-2xl drop-shadow">500</span>
+                                    <span class="text-slate-600 font-normal">/</span>
+                                    <span id="monsterHpMax" class="text-slate-300 text-sm">500</span>
+                                </div>
+                            </div>
+
+                            <!-- Massive Glowing HP Bar -->
+                            <div class="w-full h-5 rounded-full bg-surface-900 border border-slate-700 overflow-hidden p-0.5 shadow-inner">
+                                <div id="monsterHpBar" class="h-full rounded-full bg-gradient-to-r from-rose-600 via-amber-500 to-neon-lime transition-all duration-300 shadow-[0_0_12px_rgba(244,63,94,0.5)]" style="width: 100%"></div>
+                            </div>
+
+                            <div class="flex items-center justify-between text-[11px] text-slate-400 font-medium">
+                                <span>今日已造成：<b id="monsterTotalDamageText" class="text-neon-lime font-mono font-bold">0</b> 下</span>
+                                <span id="monsterSlainCountBadge" class="text-amber-300 font-mono font-bold">累計討伐：0 隻</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Compact Contribution Bar & Breakdown -->
+                    <div class="mt-2.5 pt-2 border-t border-slate-800/80">
+                        <div class="flex items-center justify-between text-xs mb-1">
+                            <span class="font-bold text-slate-300 flex items-center gap-1.5">
+                                <i class="ph-fill ph-chart-pie-slice text-neon-lime"></i>
+                                <span>參戰者傷害貢獻</span>
+                            </span>
+                            <span id="mvpContributorText" class="text-[11px] text-amber-400 font-bold">MVP：尚無紀錄</span>
+                        </div>
+                        <div id="contributionStackedBar" class="w-full h-2.5 rounded-full bg-surface-900 border border-slate-800 overflow-hidden flex"></div>
+                        <div id="contributionListContainer" class="grid grid-cols-2 gap-1.5 mt-2"></div>
+                    </div>
                 </div>
+
+                <!-- 2. 跳繩計次：GIANT HERO COUNTER & SESSION CONTROLS -->
+                <div class="glass-panel rounded-3xl p-4 sm:p-5 border border-slate-700/80 shadow-2xl relative overflow-hidden flex flex-col justify-between">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-black uppercase tracking-wider text-slate-400 block">跳繩累計次數 (JUMPS)</span>
+                            <!-- GIANT COUNTER NUMBER (Visible from 3+ meters) -->
+                            <div class="flex items-baseline gap-3 mt-0.5">
+                                <div id="mainJumpCounter" class="text-6xl sm:text-7xl lg:text-8xl font-black font-mono tracking-tight text-neon-lime select-none drop-shadow-[0_0_20px_rgba(180,255,57,0.35)] leading-none">
+                                    0
+                                </div>
+                                <span class="text-xs font-mono text-neon-lime font-black tracking-widest uppercase">TIMES</span>
+                            </div>
+                        </div>
+
+                        <!-- Current Combo Badge -->
+                        <div class="text-right bg-surface-950/90 px-4 py-2.5 rounded-2xl border border-slate-800 shadow">
+                            <span class="text-[11px] text-slate-400 block font-bold">連跳 COMBO</span>
+                            <div class="flex items-center justify-end gap-1">
+                                <span class="text-amber-400 text-lg">🔥</span>
+                                <span id="comboCounterText" class="font-mono text-2xl sm:text-3xl font-black text-amber-400">0</span>
+                            </div>
+                            <span class="text-[10px] text-slate-400 font-mono block">最高 <b id="maxComboText">0</b> 連跳</span>
+                        </div>
+                    </div>
+
+                    <!-- Core Control Action Buttons (Large, high-contrast, easy to hit) -->
+                    <div class="grid grid-cols-3 gap-2.5 mt-4">
+                        <button id="btnStartPause" onclick="toggleSessionPause()" class="col-span-2 py-3 px-4 rounded-2xl font-black text-sm sm:text-base flex items-center justify-center gap-2 transition-all bg-neon-lime text-slate-950 hover:brightness-110 shadow-xl shadow-neon-lime/25">
+                            <i id="iconStartPause" class="ph-fill ph-pause text-lg"></i>
+                            <span id="textStartPause">暫停計數</span>
+                        </button>
+                        <button onclick="startWithCountdown()" class="py-3 px-3 rounded-2xl font-black text-xs sm:text-sm bg-surface-800 hover:bg-surface-700 text-slate-200 border border-slate-700 flex items-center justify-center gap-1.5 transition shadow">
+                            <i class="ph-bold ph-timer text-neon-cyan text-lg"></i>
+                            <span>3秒倒數</span>
+                        </button>
+                    </div>
+
+                    <!-- Workout Metrics Summary Strip (Time / RPM / Calories) -->
+                    <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-slate-800/80 text-center">
+                        <div class="bg-surface-950/60 p-2 rounded-xl border border-slate-800/60">
+                            <span class="text-[10px] text-slate-400 font-bold block">運動時間</span>
+                            <span id="metricTimer" class="font-mono text-sm sm:text-base font-black text-white">00:00</span>
+                        </div>
+                        <div class="bg-surface-950/60 p-2 rounded-xl border border-slate-800/60">
+                            <span class="text-[10px] text-slate-400 font-bold block">轉速 (RPM)</span>
+                            <span id="metricRpm" class="font-mono text-sm sm:text-base font-black text-neon-cyan">0</span>
+                        </div>
+                        <div class="bg-surface-950/60 p-2 rounded-xl border border-slate-800/60">
+                            <span class="text-[10px] text-slate-400 font-bold block">消耗熱量</span>
+                            <span class="font-mono text-sm sm:text-base font-black text-amber-400"><b id="metricCalories">0.0</b> kcal</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
-        <!-- RIGHT COLUMN: Stage 2 Calibration Card OR Stage 3 Daily Monster Raid Arena + Counter + Telemetry + Tuning (5 cols) -->
-        <div class="lg:col-span-5 flex flex-col gap-4">
+        <!-- COLLAPSIBLE ADVANCED TELEMETRY & TUNING DRAWER (Default collapsed to keep gameplay clean) -->
+        <div class="glass-panel rounded-2xl border border-slate-800/80 overflow-hidden shadow-lg">
+            <button onclick="toggleAdvancedDrawer()" class="w-full flex items-center justify-between p-3 sm:px-4 bg-surface-900/60 hover:bg-surface-800/80 transition text-xs font-bold text-slate-300">
+                <span class="flex items-center gap-2">
+                    <i class="ph-bold ph-sliders-horizontal text-neon-cyan text-base"></i>
+                    <span>進階數據與設定（AI 生物力學監視器・ΔY 波形圖・靈敏度微調）</span>
+                </span>
+                <span id="advancedDrawerStatusText" class="text-slate-400 font-mono text-[11px] flex items-center gap-1">
+                    <span>展開詳細數據</span>
+                    <i id="advancedDrawerChevron" class="ph-bold ph-caret-down"></i>
+                </span>
+            </button>
 
-            <!-- STAGE 2 CARD: POSITIONING & CALIBRATION TEST PHASE (Shown in Stage 2 before Monster Appears) -->
-            <div id="stage2CalibrationCard" class="hidden glass-panel rounded-2xl p-4 sm:p-5 border-2 border-neon-cyan/60 relative overflow-hidden shadow-2xl">
-                <div class="flex items-center justify-between gap-2 mb-3">
-                    <div class="flex items-center gap-2">
-                        <span class="px-2.5 py-1 rounded-lg bg-neon-cyan/20 border border-neon-cyan/50 text-neon-cyan font-mono font-extrabold text-xs">
-                            STEP 2・定位與測試環節
+            <!-- Collapsible Drawer Body -->
+            <div id="advancedDrawerContent" class="hidden p-4 border-t border-slate-800 space-y-4">
+                <!-- 1. AI Anti-Walk Gait Filter (4 Gates) -->
+                <div>
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                        <div class="flex items-center gap-2">
+                            <i class="ph-fill ph-shield-check text-neon-cyan text-base"></i>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-200">AI 防走路 / 移動誤判生物力學監視器</h3>
+                        </div>
+                        <div class="text-xs text-slate-400">
+                            已攔截非跳繩晃動：<span id="rejectedMotionCounter" class="px-2 py-0.5 rounded-md bg-rose-500/20 border border-rose-500/40 text-rose-300 font-mono font-bold">0 次</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                        <div id="gateCardHorizontal" class="p-2 rounded-xl bg-surface-900 border border-emerald-500/30">
+                            <div class="flex items-center justify-between text-slate-400 text-[11px]">
+                                <span>① 水平位移</span>
+                                <span id="gateIconHorizontal" class="text-emerald-400 font-bold">通過</span>
+                            </div>
+                            <div class="mt-1 flex items-baseline justify-between">
+                                <span id="gateValueHorizontal" class="font-mono font-bold text-white">1.2%</span>
+                                <span class="text-[10px] text-slate-500">&lt;14%/s</span>
+                            </div>
+                        </div>
+
+                        <div id="gateCardSync" class="p-2 rounded-xl bg-surface-900 border border-emerald-500/30">
+                            <div class="flex items-center justify-between text-slate-400 text-[11px]">
+                                <span>② 雙腳同步</span>
+                                <span id="gateIconSync" class="text-emerald-400 font-bold">通過</span>
+                            </div>
+                            <div class="mt-1 flex items-baseline justify-between">
+                                <span id="gateValueSync" class="font-mono font-bold text-white">98%</span>
+                                <span class="text-[10px] text-slate-500">排除踏步</span>
+                            </div>
+                        </div>
+
+                        <div id="gateCardWrist" class="p-2 rounded-xl bg-surface-900 border border-emerald-500/30">
+                            <div class="flex items-center justify-between text-slate-400 text-[11px]">
+                                <span>③ 雙手姿態</span>
+                                <span id="gateIconWrist" class="text-emerald-400 font-bold">通過</span>
+                            </div>
+                            <div class="mt-1 flex items-baseline justify-between">
+                                <span id="gateValueWrist" class="font-mono font-bold text-white">對稱護腰</span>
+                                <span class="text-[10px] text-slate-500">排除擺臂</span>
+                            </div>
+                        </div>
+
+                        <div id="gateCardAirtime" class="p-2 rounded-xl bg-surface-900 border border-emerald-500/30">
+                            <div class="flex items-center justify-between text-slate-400 text-[11px]">
+                                <span>④ 滯空週期</span>
+                                <span id="gateIconAirtime" class="text-emerald-400 font-bold">通過</span>
+                            </div>
+                            <div class="mt-1 flex items-baseline justify-between">
+                                <span id="gateValueAirtime" class="font-mono font-bold text-white">210 ms</span>
+                                <span class="text-[10px] text-slate-500">110~680ms</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Waveform Graph -->
+                <div>
+                    <div class="flex items-center justify-between gap-2 mb-1.5">
+                        <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                            <i class="ph-bold ph-wave-sine text-neon-cyan"></i>
+                            <span>即時垂直位移與波峰偵測圖 (ΔY)</span>
                         </span>
-                        <h2 class="text-base sm:text-lg font-black text-white">開戰前鏡頭定位與試跳檢測</h2>
+                        <div class="flex items-center gap-3 text-[11px] font-mono text-slate-400">
+                            <span class="text-neon-cyan">― 軌跡</span>
+                            <span class="text-neon-lime">-- 門檻</span>
+                            <span class="text-rose-400">● 波峰</span>
+                        </div>
                     </div>
-                    <span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[11px] font-bold">
-                        🔒 怪獸等待登場中
-                    </span>
+                    <div class="h-24 w-full bg-surface-950 rounded-xl border border-slate-800 overflow-hidden relative">
+                        <canvas id="waveformCanvas" class="w-full h-full block"></canvas>
+                    </div>
                 </div>
 
-                <p class="text-xs text-slate-300 leading-relaxed mb-3.5">
-                    為確保跳繩計數精準並排除走路誤判，請確認參戰人物位於畫面中央定位框內，並完成 <b class="text-neon-lime">3 下試跳測試</b>，測試完成後怪獸將立即現身！
-                </p>
-
-                <!-- 3-Step Calibration Checklist -->
-                <div class="space-y-2.5 bg-surface-950/90 p-3.5 rounded-2xl border border-slate-800">
-                    <!-- Check 1: Body Framing -->
-                    <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-900 border border-slate-800">
-                        <div class="flex items-center gap-2.5">
-                            <div id="calIconFraming" class="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-bold text-sm">
-                                ✓
-                            </div>
-                            <div>
-                                <div class="text-xs font-extrabold text-white">① 全身入鏡與中央站位檢測</div>
-                                <div id="calTextFraming" class="text-[11px] text-slate-400">頭肩髖踝關鍵點清晰，位於中央偵測區</div>
-                            </div>
-                        </div>
-                        <span id="calBadgeFraming" class="text-xs font-mono font-bold text-emerald-400">已對準</span>
-                    </div>
-
-                    <!-- Check 2: Dynamic Ground Baseline -->
-                    <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-900 border border-slate-800">
-                        <div class="flex items-center gap-2.5">
-                            <div id="calIconBaseline" class="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-bold text-sm">
-                                ✓
-                            </div>
-                            <div>
-                                <div class="text-xs font-extrabold text-white">② 地面基準線與軀幹比例鎖定</div>
-                                <div id="calTextBaseline" class="text-[11px] text-slate-400">自動依身高距離正規化起跳門檻線</div>
-                            </div>
-                        </div>
-                        <button onclick="recalibrateBaseline(); showToast('已重新校準地面基準線！');" class="px-2 py-1 rounded bg-surface-800 hover:bg-surface-700 text-neon-cyan text-[11px] font-bold border border-slate-700">
-                            重新鎖定
+                <!-- 3. Sensitivity Tuning Sliders -->
+                <div class="pt-2 border-t border-slate-800/80">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-300">姿態靈敏度微調</span>
+                        <button onclick="recalibrateBaseline()" class="text-xs text-neon-cyan hover:underline flex items-center gap-1 font-semibold">
+                            <i class="ph-bold ph-crosshair"></i> 重新校準地面基準
                         </button>
                     </div>
-
-                    <!-- Check 3: 3 Test Jumps Progress -->
-                    <div class="p-3 rounded-xl bg-surface-900 border border-neon-lime/40">
-                        <div class="flex items-center justify-between mb-1.5">
-                            <div class="flex items-center gap-2">
-                                <i class="ph-fill ph-person-simple-run text-neon-lime text-lg"></i>
-                                <span class="text-xs font-extrabold text-white">③ 試跳測試進度 (需完成 3 下有效跳繩)</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-slate-400">起跳高度門檻</span>
+                                <span id="labelThreshold" class="font-mono text-neon-lime font-bold">12%</span>
                             </div>
-                            <span id="calTestJumpCounterText" class="font-mono font-black text-sm text-neon-lime">0 / 3 下</span>
+                            <input id="sliderThreshold" type="range" min="6" max="26" step="1" value="12" class="w-full" oninput="updateThresholdParam(this.value)">
                         </div>
-                        <div class="w-full h-3 rounded-full bg-surface-950 border border-slate-800 overflow-hidden p-0.5">
-                            <div id="calTestJumpBar" class="h-full rounded-full bg-neon-lime transition-all duration-200" style="width: 0%"></div>
-                        </div>
-                        <div class="flex items-center justify-between mt-2 text-[11px] text-slate-400">
-                            <span>💡 可對鏡頭實際跳躍、開啟 AI 模擬跳繩，或按空白鍵測試</span>
-                            <button onclick="triggerManualSimJump()" class="text-neon-cyan font-bold hover:underline">點此觸發試跳 +1</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Stage 2 Action Buttons -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-4">
-                    <button onclick="openStage1WizardModal()" class="py-2.5 px-3 rounded-xl bg-surface-800 hover:bg-surface-700 text-slate-300 font-bold text-xs border border-slate-700 flex items-center justify-center gap-1.5 transition">
-                        <i class="ph-bold ph-arrow-left"></i>
-                        <span>返回步驟 1 修改參戰人物</span>
-                    </button>
-                    <button onclick="completeCalibrationAndSummonMonster()" class="py-2.5 px-3 rounded-xl bg-neon-lime text-slate-950 font-extrabold text-xs hover:brightness-110 shadow-lg shadow-neon-lime/20 flex items-center justify-center gap-1.5 transition">
-                        <i class="ph-fill ph-sword text-base"></i>
-                        <span>完成定位測試・召喚怪獸開戰！</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- DAILY MONSTER RAID & CONTRIBUTION CARD (Requirement 3 - Unlocked in Stage 3) -->
-            <div id="monsterRaidCard" class="glass-panel rounded-2xl p-4 sm:p-5 border border-rose-500/30 relative overflow-hidden">
-                <!-- Day Cycle & Boss Tier Header -->
-                <div class="flex items-center justify-between gap-2 mb-3">
-                    <div class="flex items-center gap-2">
-                        <span id="monsterTierBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold tracking-wide bg-rose-500/20 text-rose-300 border border-rose-500/40">
-                            DAY 1・每日怪獸
-                        </span>
-                        <h2 id="monsterNameTitle" class="text-base sm:text-lg font-extrabold text-white">暗影跳跳史萊姆</h2>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <button onclick="cycleRaidDay(-1)" class="p-1.5 rounded-lg bg-surface-800 hover:bg-surface-700 text-slate-300 text-xs" title="預覽前一天怪獸">
-                            <i class="ph-bold ph-caret-left"></i>
-                        </button>
-                        <span id="raidDayIndicator" class="font-mono text-xs text-slate-300 px-1.5">第 1 / 7 天</span>
-                        <button onclick="cycleRaidDay(1)" class="p-1.5 rounded-lg bg-surface-800 hover:bg-surface-700 text-slate-300 text-xs" title="預覽下一天怪獸 (第3天中Boss / 第7天大Boss)">
-                            <i class="ph-bold ph-caret-right"></i>
-                        </button>
-                        <button onclick="openMonsterConfigModal()" class="ml-1 px-2 py-1 rounded-lg bg-surface-800 hover:bg-surface-700 border border-slate-700 text-[11px] text-neon-cyan font-semibold flex items-center gap-1" title="自訂怪獸血量目標">
-                            <i class="ph-bold ph-Sliders"></i>
-                            <span>怪獸設定</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Monster Visual Arena + HP Bar -->
-                <div class="grid grid-cols-12 gap-3 items-center bg-surface-950/85 p-3.5 rounded-2xl border border-slate-800/90">
-                    <!-- SVG Monster Avatar -->
-                    <div class="col-span-4 flex flex-col items-center justify-center relative">
-                        <div id="monsterDamageFloat" class="hidden absolute -top-2 right-1 font-mono font-black text-sm text-neon-lime drop-shadow">
-                            -1 HP!
-                        </div>
-                        <div id="monsterSvgContainer" class="w-24 h-24 flex items-center justify-center animate-monster-float">
-                            <!-- Dynamically injected SVG Monster -->
-                        </div>
-                        <span id="monsterStatusLabel" class="text-[11px] font-mono text-rose-400 font-bold mt-1">🔥 戰鬥進行中</span>
-                    </div>
-
-                    <!-- HP Progress & Stats -->
-                    <div class="col-span-8 flex flex-col gap-2">
-                        <div class="flex items-baseline justify-between">
-                            <span class="text-xs font-bold text-slate-400">怪獸剩餘生命值 (HP)</span>
-                            <div class="font-mono text-sm sm:text-base font-black">
-                                <span id="monsterHpCurrent" class="text-rose-400">500</span>
-                                <span class="text-slate-500">/</span>
-                                <span id="monsterHpMax" class="text-slate-300">500</span>
-                                <span class="text-[11px] text-slate-400 font-normal ml-0.5">下</span>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-slate-400">防走路嚴格度</span>
+                                <span id="labelAntiWalkStrictness" class="font-mono text-neon-cyan font-bold">標準 (14%)</span>
                             </div>
+                            <input id="sliderAntiWalk" type="range" min="8" max="25" step="1" value="14" class="w-full" oninput="updateAntiWalkParam(this.value)">
                         </div>
-
-                        <!-- HP Bar -->
-                        <div class="w-full h-4 rounded-full bg-surface-900 border border-slate-700 overflow-hidden p-0.5">
-                            <div id="monsterHpBar" class="h-full rounded-full bg-gradient-to-r from-rose-600 via-amber-500 to-neon-lime transition-all duration-300" style="width: 100%"></div>
-                        </div>
-
-                        <div class="flex items-center justify-between text-[11px] text-slate-400">
-                            <span>今日團隊已造成傷害：<b id="monsterTotalDamageText" class="text-neon-lime font-mono">0</b> 下</span>
-                            <span id="monsterSlainCountBadge" class="text-amber-300 font-mono">累計討伐：0 隻</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Participant Damage Contribution Bar & Breakdown -->
-                <div class="mt-3.5">
-                    <div class="flex items-center justify-between text-xs mb-1.5">
-                        <span class="font-bold text-slate-300 flex items-center gap-1.5">
-                            <i class="ph-fill ph-chart-pie-slice text-neon-lime"></i>
-                            <span>討伐怪獸・各參戰者傷害貢獻度</span>
-                        </span>
-                        <span id="mvpContributorText" class="text-[11px] text-amber-400 font-semibold">MVP：尚無紀錄</span>
-                    </div>
-
-                    <!-- Multi-segment Contribution Stacked Bar -->
-                    <div id="contributionStackedBar" class="w-full h-3 rounded-full bg-surface-900 border border-slate-800 overflow-hidden flex">
-                        <!-- Dynamically populated segments -->
-                    </div>
-
-                    <!-- Individual Contributor Pills -->
-                    <div id="contributionListContainer" class="grid grid-cols-2 gap-2 mt-2.5">
-                        <!-- Dynamically populated contributor rows -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- HERO COUNTER & SESSION CONTROLS -->
-            <div class="glass-panel rounded-2xl p-4 sm:p-5 border border-slate-800 relative overflow-hidden">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <span class="text-[11px] font-bold uppercase tracking-widest text-slate-400 block">當前參戰者本回合跳繩次數</span>
-                        <div class="flex items-baseline gap-2.5 mt-0.5">
-                            <div id="mainJumpCounter" class="text-5xl sm:text-6xl font-black font-mono tracking-tight text-white select-none">
-                                0
-                            </div>
-                            <span class="text-xs font-mono text-neon-lime font-semibold">JUMPS</span>
-                        </div>
-                    </div>
-
-                    <!-- Current Combo Badge -->
-                    <div class="text-right bg-surface-900/90 px-3.5 py-2 rounded-2xl border border-slate-800">
-                        <span class="text-[11px] text-slate-400 block">當前連續跳躍</span>
-                        <span id="comboCounterText" class="font-mono text-2xl font-extrabold text-amber-400">0</span>
-                        <span class="text-[10px] text-slate-400 font-mono block">最高 <b id="maxComboText">0</b> 連跳</span>
-                    </div>
-                </div>
-
-                <!-- Session Action Buttons -->
-                <div class="grid grid-cols-3 gap-2.5 mt-4">
-                    <button id="btnStartPause" onclick="toggleSessionPause()" class="col-span-2 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all bg-neon-lime text-slate-950 hover:brightness-110 shadow-lg shadow-neon-lime/20">
-                        <i id="iconStartPause" class="ph-fill ph-pause text-base"></i>
-                        <span id="textStartPause">暫停計數</span>
-                    </button>
-                    <button onclick="startWithCountdown()" class="py-2.5 px-3 rounded-xl font-semibold text-xs sm:text-sm bg-surface-800 hover:bg-surface-700 text-slate-200 border border-slate-700 flex items-center justify-center gap-1.5 transition">
-                        <i class="ph-bold ph-timer text-neon-cyan text-base"></i>
-                        <span>3秒倒數</span>
-                    </button>
-                </div>
-
-                <!-- Secondary Metrics Row -->
-                <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-slate-800/80 text-center">
-                    <div>
-                        <span class="text-[11px] text-slate-400 block">運動時間</span>
-                        <span id="metricTimer" class="font-mono text-sm sm:text-base font-bold text-white">00:00</span>
-                    </div>
-                    <div>
-                        <span class="text-[11px] text-slate-400 block">即時轉速 (RPM)</span>
-                        <span id="metricRpm" class="font-mono text-sm sm:text-base font-bold text-neon-cyan">0</span>
-                    </div>
-                    <div>
-                        <span class="text-[11px] text-slate-400 block">預估消耗熱量</span>
-                        <span class="font-mono text-sm sm:text-base font-bold text-amber-400"><b id="metricCalories">0.0</b> kcal</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sensitivity & Anti-Walk Threshold Tuning Card -->
-            <div class="glass-panel rounded-2xl p-4 border border-slate-800 space-y-3">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <i class="ph-bold ph-sliders-horizontal text-neon-lime"></i>
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">AI 姿態偵測與防誤判靈敏度微調</h3>
-                    </div>
-                    <button onclick="recalibrateBaseline()" class="text-xs text-neon-cyan hover:underline flex items-center gap-1 font-medium">
-                        <i class="ph-bold ph-crosshair"></i> 重新校準地面基準
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                    <div>
-                        <div class="flex justify-between mb-1">
-                            <span class="text-slate-400">起跳高度門檻 (Threshold)</span>
-                            <span id="labelThreshold" class="font-mono text-neon-lime font-bold">12%</span>
-                        </div>
-                        <input id="sliderThreshold" type="range" min="6" max="26" step="1" value="12" class="w-full" oninput="updateThresholdParam(this.value)">
-                    </div>
-                    <div>
-                        <div class="flex justify-between mb-1">
-                            <span class="text-slate-400">防走路嚴格度 (Anti-Walk)</span>
-                            <span id="labelAntiWalkStrictness" class="font-mono text-neon-cyan font-bold">標準 (14%)</span>
-                        </div>
-                        <input id="sliderAntiWalk" type="range" min="8" max="25" step="1" value="14" class="w-full" oninput="updateAntiWalkParam(this.value)">
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- MODAL 1: 100 ACHIEVEMENTS CODEX MODAL (Requirement 2) -->
+        <!-- MODAL 0: COMPACT MORE MENU / HUB MODAL -->
+    <div id="moreMenuModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-lg w-full p-5 sm:p-6 border border-slate-700 shadow-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-amber-400/15 border border-amber-400/40 flex items-center justify-center text-amber-400">
+                        <i class="ph-bold ph-dots-nine text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base sm:text-lg font-black text-white">功能選單與數據中心</h3>
+                        <p class="text-xs text-slate-400">完整輔助功能、成就與紀錄管理</p>
+                    </div>
+                </div>
+                <button onclick="closeMoreMenuModal()" class="p-1.5 rounded-lg bg-surface-800 text-slate-400 hover:text-white">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mt-4 text-xs font-bold">
+                <!-- 100 Achievements -->
+                <button onclick="closeMoreMenuModal(); openAchievementsModal();" class="p-3 rounded-2xl bg-surface-900 hover:bg-surface-800 border border-purple-500/30 text-purple-300 flex flex-col items-center gap-1.5 transition">
+                    <i class="ph-fill ph-trophy text-2xl text-amber-400"></i>
+                    <span>成就圖鑑 (<b id="navAchCount">0</b>/100)</span>
+                </button>
+
+                <!-- Yesterday Report -->
+                <button onclick="closeMoreMenuModal(); openYesterdayModal();" class="p-3 rounded-2xl bg-surface-900 hover:bg-surface-800 border border-amber-500/30 text-amber-300 flex flex-col items-center gap-1.5 transition">
+                    <i class="ph-fill ph-scroll text-2xl text-amber-400"></i>
+                    <span>昨日戰報</span>
+                </button>
+
+                <!-- Cookies Backup -->
+                <button onclick="closeMoreMenuModal(); openCookieBackupModal();" class="p-3 rounded-2xl bg-surface-900 hover:bg-surface-800 border border-emerald-500/30 text-emerald-300 flex flex-col items-center gap-1.5 transition">
+                    <i class="ph-fill ph-cookie text-2xl text-neon-lime"></i>
+                    <span>Cookies 備份/匯出</span>
+                </button>
+
+                <!-- Share Workout Card -->
+                <button onclick="closeMoreMenuModal(); openShareReportModal();" class="p-3 rounded-2xl bg-surface-900 hover:bg-surface-800 border border-neon-cyan/30 text-neon-cyan flex flex-col items-center gap-1.5 transition">
+                    <i class="ph-bold ph-share-network text-2xl text-neon-cyan"></i>
+                    <span>今日戰報卡片</span>
+                </button>
+
+                <!-- Fighter Workshop -->
+                <button onclick="closeMoreMenuModal(); openStage1WizardModal();" class="p-3 rounded-2xl bg-surface-900 hover:bg-surface-800 border border-neon-lime/30 text-neon-lime flex flex-col items-center gap-1.5 transition">
+                    <i class="ph-bold ph-users-three text-2xl text-neon-lime"></i>
+                    <span>參戰人物工坊</span>
+                </button>
+
+                <!-- Leaderboard -->
+                <button onclick="closeMoreMenuModal(); openLeaderboardModal();" class="p-3 rounded-2xl bg-surface-900 hover:bg-surface-800 border border-slate-700 text-slate-200 flex flex-col items-center gap-1.5 transition">
+                    <i class="ph-fill ph-chart-bar text-2xl text-slate-300"></i>
+                    <span>全員統計表</span>
+                </button>
+
+                <!-- Monster HP Config -->
+                <button onclick="closeMoreMenuModal(); openMonsterConfigModal();" class="p-3 rounded-2xl bg-surface-900 hover:bg-surface-800 border border-rose-500/30 text-rose-300 flex flex-col items-center gap-1.5 transition">
+                    <i class="ph-bold ph-sliders text-2xl text-rose-400"></i>
+                    <span>怪獸血量設定</span>
+                </button>
+
+                <!-- Upload Local Video -->
+                <label class="p-3 rounded-2xl bg-surface-900 hover:bg-surface-800 border border-slate-700 text-slate-300 flex flex-col items-center gap-1.5 transition cursor-pointer">
+                    <i class="ph-bold ph-upload-simple text-2xl text-amber-400"></i>
+                    <span>上傳影片測試</span>
+                    <input id="videoUploadInput" type="file" accept="video/*" class="hidden" onchange="closeMoreMenuModal(); handleVideoUpload(event);">
+                </label>
+
+                <!-- Keyboard Shortcuts -->
+                <button onclick="closeMoreMenuModal(); openShortcutsModal();" class="p-3 rounded-2xl bg-surface-900 hover:bg-surface-800 border border-slate-700 text-slate-400 flex flex-col items-center gap-1.5 transition">
+                    <i class="ph-bold ph-keyboard text-2xl text-slate-300"></i>
+                    <span>鍵盤快捷鍵 (?)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+<!-- MODAL 1: 100 ACHIEVEMENTS CODEX MODAL (Requirement 2) -->
     <div id="achievementsModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
         <div class="glass-panel rounded-3xl max-w-5xl w-full max-h-[90vh] flex flex-col border border-purple-500/40 shadow-2xl overflow-hidden">
             <!-- Modal Header -->
@@ -2943,6 +2936,7 @@
         function drawWaveformGraph() {
             const w = waveformCanvas.width;
             const h = waveformCanvas.height;
+            if (!w || !h || !waveformCanvas.offsetParent) return;
             waveCtx.clearRect(0, 0, w, h);
 
             const zeroY = h * 0.76;
@@ -3225,9 +3219,9 @@
 
         function updateStepperHeaderUI() {
             const s = state.onboardingStage;
-            const activeCls = 'flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all bg-neon-lime text-slate-950 border-neon-lime shadow-lg shadow-neon-lime/20';
-            const doneCls = 'flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-emerald-500/15 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/25';
-            const pendingCls = 'flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all bg-surface-900 text-slate-400 border-slate-800 hover:text-white';
+            const activeCls = 'px-2 py-0.5 rounded-lg text-[11px] font-extrabold transition-all bg-neon-lime text-slate-950 border border-neon-lime shadow';
+            const doneCls = 'px-2 py-0.5 rounded-lg text-[11px] font-bold transition-all bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/25';
+            const pendingCls = 'px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-all bg-surface-900 text-slate-400 border border-slate-800 hover:text-white';
 
             document.getElementById('stepBtn1').className = s === 1 ? activeCls : doneCls;
             document.getElementById('stepBtn2').className = s === 2 ? activeCls : (s > 2 ? doneCls : pendingCls);
@@ -3620,6 +3614,7 @@
             renderMonsterRaidUI();
             evaluateAllAchievements(true);
             closeCookieBackupModal();
+                closeMoreMenuModal();
             showToast('🎉 成功匯入還原參戰人物、關卡進度與 100 項成就紀錄！');
             return true;
         }
@@ -3685,6 +3680,33 @@
             const waveRect = waveformCanvas.parentElement.getBoundingClientRect();
             waveformCanvas.width = Math.max(300, Math.floor(waveRect.width));
             waveformCanvas.height = Math.max(110, Math.floor(waveRect.height));
+        }
+
+        
+        function openMoreMenuModal() {
+            const m = document.getElementById('moreMenuModal');
+            if (m) m.classList.remove('hidden');
+        }
+
+        function closeMoreMenuModal() {
+            const m = document.getElementById('moreMenuModal');
+            if (m) m.classList.add('hidden');
+        }
+
+        function toggleAdvancedDrawer() {
+            const drawer = document.getElementById('advancedDrawerContent');
+            const chevron = document.getElementById('advancedDrawerChevron');
+            const text = document.getElementById('advancedDrawerStatusText');
+            if (drawer.classList.contains('hidden')) {
+                drawer.classList.remove('hidden');
+                if (chevron) chevron.className = 'ph-bold ph-caret-up';
+                if (text) text.innerHTML = '<span>收合詳細數據</span> <i id="advancedDrawerChevron" class="ph-bold ph-caret-up"></i>';
+                if (typeof resizeCanvases === 'function') resizeCanvases();
+            } else {
+                drawer.classList.add('hidden');
+                if (chevron) chevron.className = 'ph-bold ph-caret-down';
+                if (text) text.innerHTML = '<span>展開詳細數據</span> <i id="advancedDrawerChevron" class="ph-bold ph-caret-down"></i>';
+            }
         }
 
         window.addEventListener('keydown', (e) => {
