@@ -149,18 +149,11 @@
                 </div>
             </div>
 
-            <!-- Source Switcher (Webcam / Sim / Flip) -->
-            <div class="inline-flex p-1 rounded-xl bg-surface-900 border border-slate-800 shrink-0">
-                <button id="btnModeWebcam" onclick="switchInputSource('webcam')" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white">
-                    <i class="ph-bold ph-webcam text-sm text-neon-cyan"></i>
-                    <span>鏡頭模式</span>
-                </button>
-                <button id="btnModeSim" onclick="switchInputSource('sim')" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all bg-neon-lime text-slate-950 shadow">
-                    <i class="ph-bold ph-person-simple-run text-sm"></i>
-                    <span>模擬模式</span>
-                </button>
-                <button id="btnFlipCamera" onclick="flipCamera()" class="hidden items-center gap-1 px-2 py-1 rounded-lg bg-surface-800 hover:bg-surface-700 border border-slate-700 text-xs font-medium text-slate-200 transition" title="切換前後鏡頭">
+            <!-- Camera Controls -->
+            <div class="flex items-center gap-1.5 shrink-0">
+                <button id="btnFlipCamera" onclick="flipCamera()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-800 hover:bg-surface-700 border border-slate-700 text-xs font-bold text-slate-200 transition shadow" title="切換前後鏡頭 (C鍵)">
                     <i class="ph-bold ph-camera-rotate text-sm text-neon-cyan"></i>
+                    <span class="hidden sm:inline">切換鏡頭</span>
                 </button>
             </div>
 
@@ -214,6 +207,12 @@
                     <i class="ph-bold ph-camera-plus"></i>
                     <span class="hidden sm:inline">新增拍照</span>
                 </button>
+                <div class="h-3.5 w-px bg-slate-800 hidden sm:block"></div>
+                <!-- Sensitivity / Child Mode Toggle -->
+                <button id="btnSensitivityMode" onclick="toggleSensitivityMode()" class="px-2 py-0.5 rounded-lg bg-surface-800 hover:bg-surface-700 border border-slate-700 text-slate-300 text-[11px] font-bold flex items-center gap-1 transition shadow" title="切換成人標準 / 兒童敏捷模式">
+                    <span id="iconSensitivityMode">🏋️</span>
+                    <span id="textSensitivityMode">成人標準</span>
+                </button>
             </div>
 
             <!-- Right: Stage Pills & Live Stats Summary -->
@@ -252,9 +251,24 @@
 
             <!-- LEFT: REAL-TIME AI VISION VIEWPORT (7 cols on lg) -->
             <div class="lg:col-span-7 flex flex-col">
-                <div class="relative rounded-3xl overflow-hidden glass-panel border border-slate-700/80 shadow-2xl aspect-video sm:aspect-[4/3] lg:aspect-auto lg:h-full min-h-[340px] sm:min-h-[460px] bg-surface-950 flex items-center justify-center">
+                <div id="visionViewportContainer" class="relative rounded-3xl overflow-hidden glass-panel border border-slate-700/80 shadow-2xl w-full aspect-[3/4] sm:aspect-[4/3] lg:aspect-auto lg:h-full min-h-[360px] sm:min-h-[460px] max-h-[75vh] lg:max-h-none bg-surface-950 flex items-center justify-center">
                     <video id="rawVideo" class="hidden" playsinline muted></video>
-                    <canvas id="visionCanvas" class="w-full h-full block object-cover"></canvas>
+                    <canvas id="visionCanvas" class="w-full h-full block object-contain"></canvas>
+
+                    <!-- Camera Permission Fallback Overlay -->
+                    <div id="cameraErrorOverlay" class="hidden absolute inset-0 bg-surface-950/95 backdrop-blur-md z-25 flex flex-col items-center justify-center text-center p-6">
+                        <div class="w-16 h-16 rounded-2xl bg-rose-500/20 border border-rose-500/50 flex items-center justify-center text-rose-400 text-3xl mb-3">
+                            <i class="ph-bold ph-camera-slash"></i>
+                        </div>
+                        <h3 class="text-lg font-black text-white mb-1">無法啟動鏡頭</h3>
+                        <p class="text-xs text-slate-300 max-w-sm mb-4 leading-relaxed">
+                            請允許瀏覽器存取相機權限，以進行 AI 視覺全身跳繩辨識與計數。若已封鎖，請於網址列鎖頭圖示開啟權限。
+                        </p>
+                        <button onclick="retryCameraPermission()" class="py-2.5 px-5 rounded-xl bg-neon-lime text-slate-950 font-black text-xs hover:brightness-110 shadow-lg shadow-neon-lime/20 flex items-center gap-2">
+                            <i class="ph-bold ph-arrow-clockwise text-base"></i>
+                            <span>重新嘗試啟動鏡頭</span>
+                        </button>
+                    </div>
 
                     <!-- Top-Left HUD: FPS & Pose State -->
                     <div class="absolute top-3 left-3 flex flex-wrap items-center gap-2 pointer-events-none z-10">
@@ -268,6 +282,9 @@
                         <div class="hidden sm:flex px-2.5 py-1 rounded-xl bg-black/80 backdrop-blur-md border border-emerald-500/40 text-[11px] font-mono text-emerald-300 items-center gap-1.5 shadow">
                             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
                             <span id="hudFaceVerifiedText">臉部已鎖定：阿傑</span>
+                        </div>
+                        <div id="hudSensitivityBadge" class="hidden sm:flex px-2 py-1 rounded-xl bg-black/80 backdrop-blur-md border border-white/10 text-[11px] font-mono text-slate-300 items-center gap-1 shadow">
+                            🏋️ 標準
                         </div>
                     </div>
 
@@ -317,26 +334,63 @@
                         <p class="text-xs text-slate-300 mt-3">請保持全身入鏡，雙腳同時起跳才計入有效次數</p>
                     </div>
 
-                    <!-- Simulation Controls Bar (Docked at canvas bottom) -->
-                    <div id="simControlBanner" class="absolute bottom-3 inset-x-3 flex flex-wrap items-center justify-between gap-2 px-3 py-2 rounded-2xl bg-black/90 backdrop-blur-md border border-slate-700/80 text-xs z-10">
-                        <div class="flex items-center gap-1.5 flex-wrap">
-                            <span class="text-slate-400 font-semibold mr-1">動作模擬：</span>
-                            <button id="btnSimBehaviorJump" onclick="setSimBehavior('jump')" class="px-2.5 py-1 rounded-xl bg-neon-lime text-slate-950 font-extrabold transition">
-                                🏃 跳繩
-                            </button>
-                            <button id="btnSimBehaviorWalk" onclick="setSimBehavior('walk')" class="px-2.5 py-1 rounded-xl bg-surface-800 hover:bg-surface-700 text-rose-300 border border-rose-500/30 font-semibold transition" title="模擬走路 (防誤判測試)">
-                                🚶 走路
-                            </button>
-                            <button id="btnSimBehaviorStep" onclick="setSimBehavior('step')" class="px-2.5 py-1 rounded-xl bg-surface-800 hover:bg-surface-700 text-amber-300 border border-amber-500/30 font-semibold transition" title="模擬踏步 (防誤判測試)">
-                                🦵 踏步
-                            </button>
+                    <!-- INTEGRATED LIVE JUMP COUNTER HUD (Docked at canvas bottom) -->
+                    <div id="visionLiveHud" class="absolute bottom-2.5 sm:bottom-3 inset-x-2.5 sm:inset-x-3 z-15 p-2.5 sm:p-3.5 rounded-2xl bg-black/85 backdrop-blur-md border border-white/10 shadow-2xl flex flex-col gap-2">
+                        <!-- Top Row: Giant Jump Counter + Combo + Main Action Controls -->
+                        <div class="flex items-center justify-between gap-2">
+                            <!-- Left: Giant Numbers & Combo Streak -->
+                            <div class="flex items-center gap-2.5 sm:gap-4">
+                                <div>
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">跳繩次數</span>
+                                    <div class="flex items-baseline gap-1.5">
+                                        <div id="mainJumpCounter" class="text-4xl sm:text-5xl lg:text-6xl font-black font-mono tracking-tight text-neon-lime select-none leading-none drop-shadow-[0_0_15px_rgba(180,255,57,0.45)]">
+                                            0
+                                        </div>
+                                        <span class="text-[10px] font-mono text-neon-lime font-black tracking-widest uppercase">TIMES</span>
+                                    </div>
+                                </div>
+
+                                <div class="h-8 w-px bg-slate-800"></div>
+
+                                <div class="bg-surface-950/80 px-2 sm:px-2.5 py-1 rounded-xl border border-slate-800/80">
+                                    <div class="flex items-center gap-1">
+                                        <span class="text-amber-400 text-sm">🔥</span>
+                                        <span id="comboCounterText" class="font-mono text-lg sm:text-2xl font-black text-amber-400">0</span>
+                                        <span class="text-[10px] text-amber-400/80 font-bold hidden xs:inline">COMBO</span>
+                                    </div>
+                                    <span class="text-[9px] text-slate-400 font-mono block">最高 <b id="maxComboText">0</b></span>
+                                </div>
+                            </div>
+
+                            <!-- Right: Session Action Controls -->
+                            <div class="flex items-center gap-1.5 sm:gap-2">
+                                <button id="btnStartPause" onclick="toggleSessionPause()" class="py-2 px-3 sm:px-4 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all bg-neon-lime text-slate-950 hover:brightness-110 shadow-lg shadow-neon-lime/20">
+                                    <i id="iconStartPause" class="ph-fill ph-pause text-base"></i>
+                                    <span id="textStartPause">暫停</span>
+                                </button>
+                                <button onclick="startWithCountdown()" class="py-2 px-2.5 sm:px-3 rounded-xl font-bold text-xs bg-surface-800 hover:bg-surface-700 text-slate-200 border border-slate-700 flex items-center justify-center gap-1 transition shadow" title="3秒倒數計時起跳">
+                                    <i class="ph-bold ph-timer text-neon-cyan text-base"></i>
+                                    <span class="hidden sm:inline">3秒倒數</span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2 ml-auto">
-                            <input id="simRpmSlider" type="range" min="70" max="190" value="130" class="w-16 sm:w-20" oninput="updateSimRpm(this.value)">
-                            <span id="simRpmValue" class="font-mono text-neon-lime font-bold w-14">130 RPM</span>
-                            <button onclick="triggerManualSimJump()" class="px-2.5 py-1 rounded-xl bg-surface-800 hover:bg-surface-700 text-white border border-slate-600 font-bold">
-                                試跳+1
-                            </button>
+
+                        <!-- Bottom Row: Workout Metrics Summary (Time, RPM, Calories) -->
+                        <div class="grid grid-cols-3 gap-1.5 pt-1.5 border-t border-slate-800/70 text-center font-mono text-[11px]">
+                            <div class="bg-surface-950/60 py-1 px-1.5 rounded-lg border border-slate-800/50 flex items-center justify-center gap-1">
+                                <span class="text-slate-400 text-[10px]">時間</span>
+                                <span id="metricTimer" class="font-black text-white">00:00</span>
+                            </div>
+                            <div class="bg-surface-950/60 py-1 px-1.5 rounded-lg border border-slate-800/50 flex items-center justify-center gap-1">
+                                <span class="text-slate-400 text-[10px]">轉速</span>
+                                <span id="metricRpm" class="font-black text-neon-cyan">0</span>
+                                <span class="text-[9px] text-slate-400">RPM</span>
+                            </div>
+                            <div class="bg-surface-950/60 py-1 px-1.5 rounded-lg border border-slate-800/50 flex items-center justify-center gap-1">
+                                <span class="text-slate-400 text-[10px]">熱量</span>
+                                <span id="metricCalories" class="font-black text-amber-400">0.0</span>
+                                <span class="text-[9px] text-slate-400">kcal</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -471,59 +525,7 @@
                     </div>
                 </div>
 
-                <!-- 2. 跳繩計次：GIANT HERO COUNTER & SESSION CONTROLS -->
-                <div class="glass-panel rounded-3xl p-4 sm:p-5 border border-slate-700/80 shadow-2xl relative overflow-hidden flex flex-col justify-between">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <span class="text-xs font-black uppercase tracking-wider text-slate-400 block">跳繩累計次數 (JUMPS)</span>
-                            <!-- GIANT COUNTER NUMBER (Visible from 3+ meters) -->
-                            <div class="flex items-baseline gap-3 mt-0.5">
-                                <div id="mainJumpCounter" class="text-6xl sm:text-7xl lg:text-8xl font-black font-mono tracking-tight text-neon-lime select-none drop-shadow-[0_0_20px_rgba(180,255,57,0.35)] leading-none">
-                                    0
-                                </div>
-                                <span class="text-xs font-mono text-neon-lime font-black tracking-widest uppercase">TIMES</span>
-                            </div>
-                        </div>
 
-                        <!-- Current Combo Badge -->
-                        <div class="text-right bg-surface-950/90 px-4 py-2.5 rounded-2xl border border-slate-800 shadow">
-                            <span class="text-[11px] text-slate-400 block font-bold">連跳 COMBO</span>
-                            <div class="flex items-center justify-end gap-1">
-                                <span class="text-amber-400 text-lg">🔥</span>
-                                <span id="comboCounterText" class="font-mono text-2xl sm:text-3xl font-black text-amber-400">0</span>
-                            </div>
-                            <span class="text-[10px] text-slate-400 font-mono block">最高 <b id="maxComboText">0</b> 連跳</span>
-                        </div>
-                    </div>
-
-                    <!-- Core Control Action Buttons (Large, high-contrast, easy to hit) -->
-                    <div class="grid grid-cols-3 gap-2.5 mt-4">
-                        <button id="btnStartPause" onclick="toggleSessionPause()" class="col-span-2 py-3 px-4 rounded-2xl font-black text-sm sm:text-base flex items-center justify-center gap-2 transition-all bg-neon-lime text-slate-950 hover:brightness-110 shadow-xl shadow-neon-lime/25">
-                            <i id="iconStartPause" class="ph-fill ph-pause text-lg"></i>
-                            <span id="textStartPause">暫停計數</span>
-                        </button>
-                        <button onclick="startWithCountdown()" class="py-3 px-3 rounded-2xl font-black text-xs sm:text-sm bg-surface-800 hover:bg-surface-700 text-slate-200 border border-slate-700 flex items-center justify-center gap-1.5 transition shadow">
-                            <i class="ph-bold ph-timer text-neon-cyan text-lg"></i>
-                            <span>3秒倒數</span>
-                        </button>
-                    </div>
-
-                    <!-- Workout Metrics Summary Strip (Time / RPM / Calories) -->
-                    <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-slate-800/80 text-center">
-                        <div class="bg-surface-950/60 p-2 rounded-xl border border-slate-800/60">
-                            <span class="text-[10px] text-slate-400 font-bold block">運動時間</span>
-                            <span id="metricTimer" class="font-mono text-sm sm:text-base font-black text-white">00:00</span>
-                        </div>
-                        <div class="bg-surface-950/60 p-2 rounded-xl border border-slate-800/60">
-                            <span class="text-[10px] text-slate-400 font-bold block">轉速 (RPM)</span>
-                            <span id="metricRpm" class="font-mono text-sm sm:text-base font-black text-neon-cyan">0</span>
-                        </div>
-                        <div class="bg-surface-950/60 p-2 rounded-xl border border-slate-800/60">
-                            <span class="text-[10px] text-slate-400 font-bold block">消耗熱量</span>
-                            <span class="font-mono text-sm sm:text-base font-black text-amber-400"><b id="metricCalories">0.0</b> kcal</span>
-                        </div>
-                    </div>
-                </div>
 
             </div>
         </div>
@@ -800,7 +802,7 @@
                 <div class="flex gap-2 mt-3">
                     <button onclick="captureParticipantFaceSnapshot()" class="px-3.5 py-1.5 rounded-xl bg-neon-cyan/20 hover:bg-neon-cyan/30 border border-neon-cyan/50 text-neon-cyan text-xs font-bold flex items-center gap-1.5">
                         <i class="ph-bold ph-camera"></i>
-                        <span>擷取目前鏡頭/模擬臉部</span>
+                        <span>擷取目前鏡頭臉部</span>
                     </button>
                     <button onclick="generateRandomStylizedAvatar()" class="px-3 py-1.5 rounded-xl bg-surface-800 hover:bg-surface-700 border border-slate-700 text-slate-300 text-xs font-semibold">
                         🎲 切換虛擬頭像
@@ -1254,7 +1256,7 @@
             calibrationTestJumps: 0,
             calibrationTargetJumps: 3,
 
-            inputSource: 'sim',
+            inputSource: 'webcam',
             facingMode: 'user',
             isCounting: true,
             trackingMode: 'core',
@@ -1269,6 +1271,8 @@
             soundEnabled: true,
 
             // 生物力學跳躍與防走路參數
+            sensitivityMode: 'adult',
+            baselineAnkleY: null,
             jumpStage: 'GROUNDED',
             baselineY: null,
             currentPeakDelta: 0,
@@ -1298,14 +1302,7 @@
             waveHistory: [],
             maxWavePoints: 160,
 
-            // AI 模擬行為 ('jump' | 'walk' | 'step')
-            sim: {
-                behavior: 'jump',
-                rpm: 130,
-                phase: 0,
-                walkPhase: 0,
-                manualBoost: 0
-            },
+
 
             // 怪獸討伐系統 (Requirement 3)
             raid: {
@@ -1636,6 +1633,8 @@
                 v: 3,
                 onboardingStage: state.onboardingStage,
                 hasCompletedOnboarding: state.hasCompletedOnboarding,
+                sensitivityMode: state.sensitivityMode,
+                sensitivityMode: state.sensitivityMode,
                 activeParticipantId: state.activeParticipantId,
                 raid: state.raid,
                 participants: compactParticipants,
@@ -1726,6 +1725,7 @@
                             avatar: p.avatar || createStylizedFaceAvatar(p.name.slice(0, 3), p.color || '#B4FF39', '#0F172A', idx % 2 === 0 ? 'cool' : 'smile')
                         }));
                     }
+                    if (saved.sensitivityMode) state.sensitivityMode = saved.sensitivityMode;
                     if (saved.activeParticipantId) state.activeParticipantId = saved.activeParticipantId;
                     if (saved.raid) Object.assign(state.raid, saved.raid);
                     if (saved.unlockedAchievements) state.unlockedAchievements = saved.unlockedAchievements;
@@ -2105,7 +2105,7 @@
                 const nameVal = document.getElementById('participantNameInput').value.trim() || '新勇者';
                 tempCapturedFaceDataUrl = createStylizedFaceAvatar(nameVal.slice(0, 4), selectedNewColor, '#1E293B', 'smile');
                 drawPreviewOnFaceModalCanvas(tempCapturedFaceDataUrl);
-                showToast('已擷取 AI 模擬臉部快照！');
+                showToast('已生成風格化角色頭像！');
             }
         }
 
@@ -2405,8 +2405,12 @@
             const hipCenterX = (lHip.x + rHip.x) / 2;
             const ankleCenterY = (lAnkle.y + rAnkle.y) / 2;
 
+            const isChild = state.sensitivityMode === 'child';
             const shoulderWidth = Math.hypot(lShoulder.x - rShoulder.x, lShoulder.y - rShoulder.y);
-            const torsoLength = Math.max(0.12, Math.abs(hipCenterY - shoulderCenterY), shoulderWidth * 1.15);
+            const rawTorso = Math.abs(hipCenterY - shoulderCenterY);
+            // 兒童體型比例縮減，防止成人硬下限0.12將兒童位移量腰斬
+            const minTorso = isChild ? 0.045 : 0.08;
+            const torsoLength = Math.max(minTorso, rawTorso, shoulderWidth * 1.05);
 
             // Gate 1: Horizontal Velocity Check
             const now = performance.now();
@@ -2420,17 +2424,21 @@
             }
             state.prevHipCenterX = hipCenterX;
 
-            const horizontalPass = horizSpeedRatio < state.antiWalkMaxHorizSpeed;
+            // 兒童模式允許更自然的身體橫向微幅晃動
+            const maxHorizSpeed = isChild ? Math.max(0.24, state.antiWalkMaxHorizSpeed) : state.antiWalkMaxHorizSpeed;
+            const horizontalPass = horizSpeedRatio < maxHorizSpeed;
 
             // Gate 2: Bilateral Foot Synchronization
             const ankleDiffNormalized = Math.abs(lAnkle.y - rAnkle.y) / torsoLength;
             const hipDiffNormalized = Math.abs(lHip.y - rHip.y) / torsoLength;
-            const footSyncScore = Math.max(0, Math.min(1, 1 - (ankleDiffNormalized * 1.9 + hipDiffNormalized * 1.2)));
-            const footSyncPass = footSyncScore >= 0.72;
+            const footSyncScore = Math.max(0, Math.min(1, 1 - (ankleDiffNormalized * 1.8 + hipDiffNormalized * 1.1)));
+            const minFootSync = isChild ? 0.45 : 0.70;
+            const footSyncPass = footSyncScore >= minFootSync;
 
-            // Gate 3: Wrist Rope-Swing Symmetry
+            // Gate 3: Wrist Rope-Swing Symmetry (兒童手臂協調尚在發展，放寬手部限制)
             const wristHeightDiff = Math.abs(lWrist.y - rWrist.y) / torsoLength;
-            const wristSymmetryPass = wristHeightDiff < 0.42;
+            const maxWristDiff = isChild ? 0.85 : 0.42;
+            const wristSymmetryPass = wristHeightDiff < maxWristDiff;
 
             state.gaitStatus.horizontalSpeedRatio = horizSpeedRatio;
             state.gaitStatus.horizontalPass = horizontalPass;
@@ -2438,22 +2446,33 @@
             state.gaitStatus.footSyncPass = footSyncPass;
             state.gaitStatus.wristSymmetryPass = wristSymmetryPass;
 
-            const trackedY = state.trackingMode === 'ankles' ? ankleCenterY : (shoulderCenterY * 0.4 + hipCenterY * 0.6);
+            // 雙點屈膝收腿融合追蹤 (Dual-Point Core + Ankle Tuck Tracking)
+            const coreY = shoulderCenterY * 0.4 + hipCenterY * 0.6;
+            const ankleY = ankleCenterY;
 
-            if (state.baselineY === null) {
-                state.baselineY = trackedY;
-            }
+            if (state.baselineY === null) state.baselineY = coreY;
+            if (state.baselineAnkleY === null) state.baselineAnkleY = ankleY;
 
-            const rawDisplacement = state.baselineY - trackedY;
-            const normalizedDelta = rawDisplacement / torsoLength;
+            const coreDisplacement = state.baselineY - coreY;
+            const ankleDisplacement = state.baselineAnkleY - ankleY;
 
+            const coreDelta = coreDisplacement / torsoLength;
+            const ankleDelta = ankleDisplacement / torsoLength;
+
+            // 核心與腳踝加權融合：成人主要看質心，兒童模式強化腳踝抬起（收小腿屈膝跳）
+            const ankleWeight = isChild ? 0.88 : 0.70;
+            const normalizedDelta = Math.max(coreDelta, ankleDelta * ankleWeight);
+            const trackedY = coreY;
+
+            // 地面待機基準線平滑更新
             if (state.jumpStage === 'GROUNDED' && Math.abs(normalizedDelta) < state.thresholdRatio * 0.6 && horizontalPass) {
-                state.baselineY = state.baselineY * 0.96 + trackedY * 0.04;
+                state.baselineY = state.baselineY * 0.96 + coreY * 0.04;
+                state.baselineAnkleY = state.baselineAnkleY * 0.96 + ankleY * 0.04;
             }
 
             let peakDetected = false;
             const upThreshold = state.thresholdRatio;
-            const downThreshold = state.thresholdRatio * 0.42;
+            const downThreshold = state.thresholdRatio * (isChild ? 0.38 : 0.42);
 
             if (state.isCounting) {
                 if (state.jumpStage === 'GROUNDED') {
@@ -2470,7 +2489,7 @@
                         }
                     }
                 } else if (state.jumpStage === 'AIRBORNE') {
-                    if (!horizontalPass || !footSyncPass) {
+                    if (!horizontalPass || (!footSyncPass && !isChild)) {
                         state.jumpStage = 'GROUNDED';
                         state.currentPeakDelta = 0;
                         registerRejectedWalkEvent(!horizontalPass ? '空中橫移過大 (走路/跨步)' : '左右腳不同步 (踏步)');
@@ -2481,7 +2500,8 @@
                         if (normalizedDelta < downThreshold) {
                             const airtimeMs = now - state.airborneStartTimestamp;
                             state.gaitStatus.airtimeMs = Math.round(airtimeMs);
-                            const airtimePass = airtimeMs >= 95 && airtimeMs <= 720;
+                            const minAirtime = isChild ? 80 : 95;
+                            const airtimePass = airtimeMs >= minAirtime && airtimeMs <= 760;
                             state.gaitStatus.airtimePass = airtimePass;
 
                             if (airtimePass && (now - state.lastJumpTimestamp >= state.minJumpIntervalMs)) {
@@ -2708,124 +2728,27 @@
         const waveformCanvas = document.getElementById('waveformCanvas');
         const waveCtx = waveformCanvas.getContext('2d');
 
-        function generateSimulatedLandmarks(dt) {
-            const behavior = state.sim.behavior;
-            const freqHz = state.sim.rpm / 60;
-            state.sim.phase = (state.sim.phase + dt * freqHz) % 1.0;
-            state.sim.walkPhase = (state.sim.walkPhase + dt * 0.85) % 1.0;
-
-            let centerX = 0.5;
-            let lJumpOffset = 0;
-            let rJumpOffset = 0;
-            let lWristY = 0.49;
-            let rWristY = 0.49;
-
-            if (behavior === 'jump') {
-                const p = state.sim.phase;
-                let jumpLift = 0;
-                if (p < 0.44) {
-                    jumpLift = Math.sin((p / 0.44) * Math.PI) * 0.068;
-                }
-                if (state.sim.manualBoost > 0.001) {
-                    jumpLift = Math.max(jumpLift, state.sim.manualBoost);
-                    state.sim.manualBoost *= 0.86;
-                }
-                lJumpOffset = jumpLift;
-                rJumpOffset = jumpLift;
-                const ropeAngle = p * Math.PI * 2;
-                lWristY = 0.48 - jumpLift + Math.sin(ropeAngle) * 0.018;
-                rWristY = 0.48 - jumpLift + Math.sin(ropeAngle) * 0.018;
-            } else if (behavior === 'walk') {
-                centerX = 0.5 + Math.sin(state.sim.walkPhase * Math.PI * 2) * 0.22;
-                const bob = Math.abs(Math.sin(state.sim.walkPhase * Math.PI * 4)) * 0.048;
-                lJumpOffset = bob + Math.sin(state.sim.walkPhase * Math.PI * 2) * 0.045;
-                rJumpOffset = bob - Math.sin(state.sim.walkPhase * Math.PI * 2) * 0.045;
-                lWristY = 0.46 + Math.sin(state.sim.walkPhase * Math.PI * 2) * 0.08;
-                rWristY = 0.46 - Math.sin(state.sim.walkPhase * Math.PI * 2) * 0.08;
-            } else if (behavior === 'step') {
-                const alt = Math.sin(state.sim.phase * Math.PI * 2);
-                lJumpOffset = alt > 0 ? alt * 0.075 : 0;
-                rJumpOffset = alt < 0 ? -alt * 0.075 : 0;
-                lWristY = 0.48;
-                rWristY = 0.48;
-            }
-
-            const bodyLift = (lJumpOffset + rJumpOffset) * 0.5;
-            const lm = new Array(33).fill(null).map(() => ({ x: centerX, y: 0.5, z: 0, visibility: 0.99 }));
-
-            lm[0] = { x: centerX, y: 0.22 - bodyLift, visibility: 0.99 };
-            lm[11] = { x: centerX - 0.09, y: 0.33 - bodyLift, visibility: 0.99 };
-            lm[12] = { x: centerX + 0.09, y: 0.33 - bodyLift, visibility: 0.99 };
-            lm[13] = { x: centerX - 0.13, y: 0.43 - bodyLift, visibility: 0.99 };
-            lm[14] = { x: centerX + 0.13, y: 0.43 - bodyLift, visibility: 0.99 };
-            lm[15] = { x: centerX - 0.15, y: lWristY, visibility: 0.99 };
-            lm[16] = { x: centerX + 0.15, y: rWristY, visibility: 0.99 };
-            lm[23] = { x: centerX - 0.055, y: 0.54 - lJumpOffset * 0.85, visibility: 0.99 };
-            lm[24] = { x: centerX + 0.055, y: 0.54 - rJumpOffset * 0.85, visibility: 0.99 };
-            lm[25] = { x: centerX - 0.06, y: 0.71 - lJumpOffset * 0.95, visibility: 0.99 };
-            lm[26] = { x: centerX + 0.06, y: 0.71 - rJumpOffset * 0.95, visibility: 0.99 };
-            lm[27] = { x: centerX - 0.055, y: 0.87 - lJumpOffset, visibility: 0.99 };
-            lm[28] = { x: centerX + 0.055, y: 0.87 - rJumpOffset, visibility: 0.99 };
-
-            return { landmarks: lm, ropePhase: state.sim.phase, lift: bodyLift, centerX };
-        }
-
-        function setSimBehavior(mode) {
-            state.sim.behavior = mode;
-            const btnJump = document.getElementById('btnSimBehaviorJump');
-            const btnWalk = document.getElementById('btnSimBehaviorWalk');
-            const btnStep = document.getElementById('btnSimBehaviorStep');
-
-            btnJump.className = mode === 'jump'
-                ? 'px-2.5 py-1 rounded-lg bg-neon-lime text-slate-950 font-bold transition'
-                : 'px-2.5 py-1 rounded-lg bg-surface-800 hover:bg-surface-700 text-slate-300 font-semibold transition';
-
-            btnWalk.className = mode === 'walk'
-                ? 'px-2.5 py-1 rounded-lg bg-rose-500 text-white font-bold transition shadow-lg shadow-rose-500/30'
-                : 'px-2.5 py-1 rounded-lg bg-surface-800 hover:bg-surface-700 text-rose-300 border border-rose-500/30 font-semibold transition';
-
-            btnStep.className = mode === 'step'
-                ? 'px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 font-bold transition shadow-lg shadow-amber-400/30'
-                : 'px-2.5 py-1 rounded-lg bg-surface-800 hover:bg-surface-700 text-amber-300 border border-amber-500/30 font-semibold transition';
-        }
-
-        function drawVisionScene(landmarks, trackingInfo, simExtra = null) {
+        function drawVisionScene(landmarks, trackingInfo) {
             const w = visionCanvas.width;
             const h = visionCanvas.height;
             visionCtx.clearRect(0, 0, w, h);
 
-            if (state.inputSource === 'sim') {
-                const bgGrad = visionCtx.createRadialGradient(w * 0.5, h * 0.45, 20, w * 0.5, h * 0.5, w * 0.7);
-                bgGrad.addColorStop(0, '#131C31');
-                bgGrad.addColorStop(1, '#060A12');
-                visionCtx.fillStyle = bgGrad;
-                visionCtx.fillRect(0, 0, w, h);
-
-                visionCtx.strokeStyle = 'rgba(148, 163, 184, 0.08)';
-                visionCtx.lineWidth = 1;
-                const floorY = h * 0.89;
-                visionCtx.beginPath();
-                visionCtx.moveTo(0, floorY);
-                visionCtx.lineTo(w, floorY);
-                visionCtx.stroke();
-            } else {
-                visionCtx.save();
-                if (state.inputSource === 'webcam' && state.facingMode === 'user') {
-                    visionCtx.translate(w, 0);
-                    visionCtx.scale(-1, 1);
-                }
-                const rawVid = document.getElementById('rawVideo');
-                if (rawVid.readyState >= 2) {
-                    visionCtx.drawImage(rawVid, 0, 0, w, h);
-                }
-                visionCtx.restore();
-                visionCtx.fillStyle = 'rgba(6, 10, 18, 0.24)';
-                visionCtx.fillRect(0, 0, w, h);
+            visionCtx.save();
+            if (state.facingMode === 'user') {
+                visionCtx.translate(w, 0);
+                visionCtx.scale(-1, 1);
             }
+            const rawVid = document.getElementById('rawVideo');
+            if (rawVid && rawVid.readyState >= 2) {
+                visionCtx.drawImage(rawVid, 0, 0, w, h);
+            }
+            visionCtx.restore();
+            visionCtx.fillStyle = 'rgba(6, 10, 18, 0.22)';
+            visionCtx.fillRect(0, 0, w, h);
 
             if (!landmarks) return;
 
-            const mirrorX = (state.inputSource === 'webcam' && state.facingMode === 'user');
+            const mirrorX = (state.facingMode === 'user');
             const toX = (nx) => (mirrorX ? (1 - nx) * w : nx * w);
             const toY = (ny) => ny * h;
 
@@ -2858,29 +2781,15 @@
 
                 visionCtx.beginPath();
                 visionCtx.moveTo(boxX, boxY + cornerLen); visionCtx.lineTo(boxX, boxY); visionCtx.lineTo(boxX + cornerLen, boxY);
-                visionCtx.moveTo(boxX + boxW - cornerLen, boxY); visionCtx.lineTo(boxX + boxW, boxY); visionCtx.lineTo(boxX + boxW, boxY + cornerLen);
+                visionCtx.moveTo(boxX + boxW - cornerLen, boxY); visionCtx.lineTo(boxX + boxW); visionCtx.lineTo(boxX + boxW, boxY + cornerLen);
                 visionCtx.moveTo(boxX, boxY + boxH - cornerLen); visionCtx.lineTo(boxX, boxY + boxH); visionCtx.lineTo(boxX + cornerLen, boxY + boxH);
-                visionCtx.moveTo(boxX + boxW - cornerLen, boxY + boxH); visionCtx.lineTo(boxX + boxW, boxY + boxH); visionCtx.lineTo(boxX + boxW, boxY + boxH - cornerLen);
+                visionCtx.moveTo(boxX + boxW - cornerLen, boxY + boxH); visionCtx.lineTo(boxX + boxW); visionCtx.lineTo(boxX + boxW, boxY + boxH - cornerLen);
                 visionCtx.stroke();
 
                 visionCtx.setLineDash([6, 6]);
                 visionCtx.strokeStyle = 'rgba(0, 240, 255, 0.35)';
                 visionCtx.lineWidth = 1.5;
                 visionCtx.strokeRect(boxX, boxY, boxW, boxH);
-                visionCtx.restore();
-            }
-
-            if (simExtra && state.sim.behavior === 'jump') {
-                const lw = landmarks[15];
-                const rw = landmarks[16];
-                const arcPeakY = 0.5 + Math.cos(simExtra.ropePhase * Math.PI * 2) * 0.44;
-                visionCtx.save();
-                visionCtx.strokeStyle = simExtra.ropePhase < 0.45 ? 'rgba(180, 255, 57, 0.85)' : 'rgba(148, 163, 184, 0.35)';
-                visionCtx.lineWidth = 2.5;
-                visionCtx.beginPath();
-                visionCtx.moveTo(toX(lw.x), toY(lw.y));
-                visionCtx.quadraticCurveTo(toX(simExtra.centerX), toY(arcPeakY), toX(rw.x), toY(rw.y));
-                visionCtx.stroke();
                 visionCtx.restore();
             }
 
@@ -3023,25 +2932,26 @@
             stopCurrentVideoStream();
             state.inputSource = mode;
             recalibrateBaseline();
-
-            const btnWebcam = document.getElementById('btnModeWebcam');
-            const btnSim = document.getElementById('btnModeSim');
-            const simBanner = document.getElementById('simControlBanner');
             const btnFlip = document.getElementById('btnFlipCamera');
-
+            if (btnFlip) btnFlip.classList.remove('hidden');
             if (mode === 'webcam') {
-                btnWebcam.className = 'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all bg-neon-lime text-slate-950 shadow';
-                btnSim.className = 'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white';
-                simBanner.classList.add('hidden');
-                btnFlip.classList.remove('hidden');
-                btnFlip.classList.add('inline-flex');
                 await startWebcamStream();
-            } else if (mode === 'sim') {
-                btnSim.className = 'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all bg-neon-lime text-slate-950 shadow';
-                btnWebcam.className = 'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-300 hover:text-white';
-                simBanner.classList.remove('hidden');
-                btnFlip.classList.add('hidden');
-                document.getElementById('aiStatusText').textContent = 'AI 模擬引擎運行中';
+            }
+        }
+
+        function adjustVisionViewportRatio() {
+            if (!rawVideo || rawVideo.videoWidth <= 0 || rawVideo.videoHeight <= 0) return;
+            const vw = rawVideo.videoWidth;
+            const vh = rawVideo.videoHeight;
+            visionCanvas.width = vw;
+            visionCanvas.height = vh;
+            const container = document.getElementById('visionViewportContainer');
+            if (container) {
+                if (window.innerWidth < 1024) {
+                    container.style.aspectRatio = `${vw} / ${vh}`;
+                } else {
+                    container.style.aspectRatio = '';
+                }
             }
         }
 
@@ -3053,17 +2963,29 @@
                 rawVideo.srcObject = stream;
                 await rawVideo.play();
                 document.getElementById('aiStatusText').textContent = '鏡頭即時分析中';
+                const errOverlay = document.getElementById('cameraErrorOverlay');
+                if (errOverlay) errOverlay.classList.add('hidden');
+                adjustVisionViewportRatio();
                 requestWakeLock();
                 showToast('鏡頭已啟動！請站於畫面中央保持全身入鏡');
             } catch (err) {
-                showToast('無法取得相機權限，已自動切換回 AI 模擬模式', true);
-                switchInputSource('sim');
+                console.error('Camera stream error:', err);
+                const errOverlay = document.getElementById('cameraErrorOverlay');
+                if (errOverlay) errOverlay.classList.remove('hidden');
+                document.getElementById('aiStatusText').textContent = '鏡頭未啟動';
+                showToast('無法取得相機權限，請確認相機權限已開啟', true);
             }
+        }
+
+        function retryCameraPermission() {
+            const errOverlay = document.getElementById('cameraErrorOverlay');
+            if (errOverlay) errOverlay.classList.add('hidden');
+            startWebcamStream();
         }
 
         function flipCamera() {
             state.facingMode = state.facingMode === 'user' ? 'environment' : 'user';
-            if (state.inputSource === 'webcam') startWebcamStream();
+            startWebcamStream();
         }
 
         async function handleVideoUpload(event) {
@@ -3071,11 +2993,11 @@
             if (!file) return;
             stopCurrentVideoStream();
             state.inputSource = 'video';
-            document.getElementById('simControlBanner').classList.add('hidden');
             await initMediaPipePose();
             rawVideo.src = URL.createObjectURL(file);
             rawVideo.loop = true;
             await rawVideo.play();
+            adjustVisionViewportRatio();
             showToast(`正在分析影片：${file.name}`);
         }
 
@@ -3111,21 +3033,15 @@
                 document.getElementById('metricTimer').textContent = `${mins}:${secs}`;
             }
 
-            if (state.inputSource === 'sim') {
-                const simData = generateSimulatedLandmarks(dt);
-                const info = processLandmarksAndGait(simData.landmarks);
-                drawVisionScene(simData.landmarks, info, simData);
-            } else {
-                if (rawVideo.readyState >= 2 && mediaPipePose && !isPoseBusy) {
-                    isPoseBusy = true;
-                    try {
-                        await mediaPipePose.send({ image: rawVideo });
-                    } catch (e) {}
-                    isPoseBusy = false;
-                }
-                const info = latestMediaPipeLandmarks ? processLandmarksAndGait(latestMediaPipeLandmarks) : null;
-                drawVisionScene(latestMediaPipeLandmarks, info, null);
+            if (rawVideo.readyState >= 2 && mediaPipePose && !isPoseBusy) {
+                isPoseBusy = true;
+                try {
+                    await mediaPipePose.send({ image: rawVideo });
+                } catch (e) {}
+                isPoseBusy = false;
             }
+            const info = latestMediaPipeLandmarks ? processLandmarksAndGait(latestMediaPipeLandmarks) : null;
+            drawVisionScene(latestMediaPipeLandmarks, info);
 
             drawWaveformGraph();
             requestAnimationFrame(mainAnimationLoop);
@@ -3181,9 +3097,78 @@
 
         function recalibrateBaseline() {
             state.baselineY = null;
+            state.baselineAnkleY = null;
             state.jumpStage = 'GROUNDED';
             state.prevHipCenterX = null;
         }
+        function toggleSensitivityMode(targetMode = null) {
+            if (targetMode) {
+                state.sensitivityMode = targetMode;
+            } else {
+                state.sensitivityMode = state.sensitivityMode === 'child' ? 'adult' : 'child';
+            }
+
+            const isChild = state.sensitivityMode === 'child';
+            if (isChild) {
+                state.thresholdRatio = 0.07;
+                state.antiWalkMaxHorizSpeed = 0.24;
+                state.minJumpIntervalMs = 160;
+            } else {
+                state.thresholdRatio = 0.12;
+                state.antiWalkMaxHorizSpeed = 0.14;
+                state.minJumpIntervalMs = 210;
+            }
+
+            recalibrateBaseline();
+            updateSensitivityModeUI();
+            savePersistentState();
+
+            if (isChild) {
+                showToast('👶 已切換為【兒童敏捷模式】：起跳門檻降至 7%、啟用屈膝收腿雙點追蹤、防誤判寬鬆！');
+            } else {
+                showToast('🏋️ 已切換為【成人標準模式】：起跳門檻 12%、標準防作弊生物力學！');
+            }
+        }
+
+        function updateSensitivityModeUI() {
+            const isChild = state.sensitivityMode === 'child';
+            const btn = document.getElementById('btnSensitivityMode');
+            const icon = document.getElementById('iconSensitivityMode');
+            const text = document.getElementById('textSensitivityMode');
+
+            if (btn) {
+                if (isChild) {
+                    btn.className = 'px-2 py-0.5 rounded-lg bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/50 text-[11px] font-bold flex items-center gap-1 transition shadow shadow-neon-cyan/15';
+                    if (icon) icon.textContent = '👶';
+                    if (text) text.textContent = '兒童敏捷';
+                } else {
+                    btn.className = 'px-2 py-0.5 rounded-lg bg-surface-800 hover:bg-surface-700 border border-slate-700 text-slate-300 text-[11px] font-bold flex items-center gap-1 transition shadow';
+                    if (icon) icon.textContent = '🏋️';
+                    if (text) text.textContent = '成人標準';
+                }
+            }
+
+            const hudBadge = document.getElementById('hudSensitivityBadge');
+            if (hudBadge) {
+                hudBadge.textContent = isChild ? '👶 兒童' : '🏋️ 標準';
+                hudBadge.className = isChild
+                    ? 'hidden sm:flex px-2 py-1 rounded-xl bg-neon-cyan/25 border border-neon-cyan/50 text-[11px] font-mono text-neon-cyan font-bold shadow'
+                    : 'hidden sm:flex px-2 py-1 rounded-xl bg-black/80 border border-white/10 text-[11px] font-mono text-slate-300 shadow';
+            }
+
+            const sliderThresh = document.getElementById('sliderThreshold');
+            const labelThresh = document.getElementById('labelThreshold');
+            if (sliderThresh) sliderThresh.value = Math.round(state.thresholdRatio * 100);
+            if (labelThresh) labelThresh.textContent = `${Math.round(state.thresholdRatio * 100)}%`;
+
+            const sliderAnti = document.getElementById('sliderAntiWalk');
+            const labelAnti = document.getElementById('labelAntiWalkStrictness');
+            if (sliderAnti) sliderAnti.value = Math.round(state.antiWalkMaxHorizSpeed * 100);
+            if (labelAnti) {
+                labelAnti.textContent = `${isChild ? '兒童寬鬆' : '標準'} (${Math.round(state.antiWalkMaxHorizSpeed * 100)}%)`;
+            }
+        }
+
 
         function updateThresholdParam(val) {
             const num = parseInt(val, 10);
@@ -3197,19 +3182,8 @@
             document.getElementById('labelAntiWalkStrictness').textContent = `${num <= 11 ? '極嚴格' : num <= 16 ? '標準' : '寬鬆'} (${num}%)`;
         }
 
-        function triggerManualSimJump() {
-            if (state.inputSource !== 'sim') {
-                registerValidJump(performance.now());
-                return;
-            }
-            setSimBehavior('jump');
-            state.sim.manualBoost = 0.085;
+        function triggerManualJumpTest() {
             registerValidJump(performance.now());
-        }
-
-        function updateSimRpm(val) {
-            state.sim.rpm = parseInt(val, 10);
-            document.getElementById('simRpmValue').textContent = `${state.sim.rpm} RPM`;
         }
 
         let wizardSelectedColor = '#B4FF39';
@@ -3248,7 +3222,10 @@
         function enterStage(stageNum) {
             if (stageNum === 1) {
                 state.onboardingStage = 1;
-                updateStepperHeaderUI();
+            updateStepperHeaderUI();
+            updateSensitivityModeUI();
+            // 自動啟動鏡頭串流
+            startWebcamStream();
                 openStage1WizardModal();
                 return;
             }
@@ -3673,16 +3650,25 @@
         }
 
         function resizeCanvases() {
-            const visionRect = visionCanvas.parentElement.getBoundingClientRect();
-            visionCanvas.width = Math.max(480, Math.floor(visionRect.width));
-            visionCanvas.height = Math.max(320, Math.floor(visionRect.height));
+            if (rawVideo && rawVideo.videoWidth > 0 && rawVideo.videoHeight > 0) {
+                visionCanvas.width = rawVideo.videoWidth;
+                visionCanvas.height = rawVideo.videoHeight;
+                const container = document.getElementById('visionViewportContainer');
+                if (container && window.innerWidth < 1024) {
+                    container.style.aspectRatio = `${rawVideo.videoWidth} / ${rawVideo.videoHeight}`;
+                }
+            } else {
+                const visionRect = visionCanvas.parentElement.getBoundingClientRect();
+                const isMobile = window.innerWidth < 640;
+                visionCanvas.width = Math.max(isMobile ? 360 : 480, Math.floor(visionRect.width));
+                visionCanvas.height = Math.max(isMobile ? 480 : 320, Math.floor(visionRect.height));
+            }
 
             const waveRect = waveformCanvas.parentElement.getBoundingClientRect();
             waveformCanvas.width = Math.max(300, Math.floor(waveRect.width));
             waveformCanvas.height = Math.max(110, Math.floor(waveRect.height));
         }
 
-        
         function openMoreMenuModal() {
             const m = document.getElementById('moreMenuModal');
             if (m) m.classList.remove('hidden');
@@ -3714,7 +3700,7 @@
 
             if (e.code === 'Space') {
                 e.preventDefault();
-                triggerManualSimJump();
+                toggleSessionPause();
             } else if (e.code === 'KeyP') {
                 e.preventDefault();
                 toggleSessionPause();
@@ -3753,6 +3739,20 @@
         });
 
         window.addEventListener('resize', resizeCanvases);
+        rawVideo.addEventListener('loadedmetadata', () => {
+            adjustVisionViewportRatio();
+            resizeCanvases();
+        });
+        rawVideo.addEventListener('resize', () => {
+            adjustVisionViewportRatio();
+            resizeCanvases();
+        });
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                adjustVisionViewportRatio();
+                resizeCanvases();
+            }, 250);
+        });
 
 
         // ==================== SCREEN WAKE LOCK API ====================
@@ -4169,7 +4169,7 @@
             </div>
             <div class="grid grid-cols-2 gap-2.5 text-xs">
                 <div class="p-2.5 rounded-xl bg-surface-950 border border-slate-800 flex items-center justify-between">
-                    <span class="text-slate-300">手動試跳 / 模擬+1</span>
+                    <span class="text-slate-300">暫停 / 繼續計數</span>
                     <kbd class="px-2 py-0.5 rounded bg-surface-800 text-neon-lime font-mono font-bold border border-slate-700">Space</kbd>
                 </div>
                 <div class="p-2.5 rounded-xl bg-surface-950 border border-slate-800 flex items-center justify-between">
