@@ -207,6 +207,12 @@
                     <i class="ph-bold ph-camera-plus"></i>
                     <span class="hidden sm:inline">新增拍照</span>
                 </button>
+                <div class="h-3.5 w-px bg-slate-800 hidden sm:block"></div>
+                <!-- Sensitivity / Child Mode Toggle -->
+                <button id="btnSensitivityMode" onclick="toggleSensitivityMode()" class="px-2 py-0.5 rounded-lg bg-surface-800 hover:bg-surface-700 border border-slate-700 text-slate-300 text-[11px] font-bold flex items-center gap-1 transition shadow" title="切換成人標準 / 兒童敏捷模式">
+                    <span id="iconSensitivityMode">🏋️</span>
+                    <span id="textSensitivityMode">成人標準</span>
+                </button>
             </div>
 
             <!-- Right: Stage Pills & Live Stats Summary -->
@@ -276,6 +282,9 @@
                         <div class="hidden sm:flex px-2.5 py-1 rounded-xl bg-black/80 backdrop-blur-md border border-emerald-500/40 text-[11px] font-mono text-emerald-300 items-center gap-1.5 shadow">
                             <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
                             <span id="hudFaceVerifiedText">臉部已鎖定：阿傑</span>
+                        </div>
+                        <div id="hudSensitivityBadge" class="hidden sm:flex px-2 py-1 rounded-xl bg-black/80 backdrop-blur-md border border-white/10 text-[11px] font-mono text-slate-300 items-center gap-1 shadow">
+                            🏋️ 標準
                         </div>
                     </div>
 
@@ -1262,6 +1271,8 @@
             soundEnabled: true,
 
             // 生物力學跳躍與防走路參數
+            sensitivityMode: 'adult',
+            baselineAnkleY: null,
             jumpStage: 'GROUNDED',
             baselineY: null,
             currentPeakDelta: 0,
@@ -1622,6 +1633,8 @@
                 v: 3,
                 onboardingStage: state.onboardingStage,
                 hasCompletedOnboarding: state.hasCompletedOnboarding,
+                sensitivityMode: state.sensitivityMode,
+                sensitivityMode: state.sensitivityMode,
                 activeParticipantId: state.activeParticipantId,
                 raid: state.raid,
                 participants: compactParticipants,
@@ -1712,6 +1725,7 @@
                             avatar: p.avatar || createStylizedFaceAvatar(p.name.slice(0, 3), p.color || '#B4FF39', '#0F172A', idx % 2 === 0 ? 'cool' : 'smile')
                         }));
                     }
+                    if (saved.sensitivityMode) state.sensitivityMode = saved.sensitivityMode;
                     if (saved.activeParticipantId) state.activeParticipantId = saved.activeParticipantId;
                     if (saved.raid) Object.assign(state.raid, saved.raid);
                     if (saved.unlockedAchievements) state.unlockedAchievements = saved.unlockedAchievements;
@@ -2391,8 +2405,12 @@
             const hipCenterX = (lHip.x + rHip.x) / 2;
             const ankleCenterY = (lAnkle.y + rAnkle.y) / 2;
 
+            const isChild = state.sensitivityMode === 'child';
             const shoulderWidth = Math.hypot(lShoulder.x - rShoulder.x, lShoulder.y - rShoulder.y);
-            const torsoLength = Math.max(0.12, Math.abs(hipCenterY - shoulderCenterY), shoulderWidth * 1.15);
+            const rawTorso = Math.abs(hipCenterY - shoulderCenterY);
+            // 兒童體型比例縮減，防止成人硬下限0.12將兒童位移量腰斬
+            const minTorso = isChild ? 0.045 : 0.08;
+            const torsoLength = Math.max(minTorso, rawTorso, shoulderWidth * 1.05);
 
             // Gate 1: Horizontal Velocity Check
             const now = performance.now();
@@ -2406,17 +2424,21 @@
             }
             state.prevHipCenterX = hipCenterX;
 
-            const horizontalPass = horizSpeedRatio < state.antiWalkMaxHorizSpeed;
+            // 兒童模式允許更自然的身體橫向微幅晃動
+            const maxHorizSpeed = isChild ? Math.max(0.24, state.antiWalkMaxHorizSpeed) : state.antiWalkMaxHorizSpeed;
+            const horizontalPass = horizSpeedRatio < maxHorizSpeed;
 
             // Gate 2: Bilateral Foot Synchronization
             const ankleDiffNormalized = Math.abs(lAnkle.y - rAnkle.y) / torsoLength;
             const hipDiffNormalized = Math.abs(lHip.y - rHip.y) / torsoLength;
-            const footSyncScore = Math.max(0, Math.min(1, 1 - (ankleDiffNormalized * 1.9 + hipDiffNormalized * 1.2)));
-            const footSyncPass = footSyncScore >= 0.72;
+            const footSyncScore = Math.max(0, Math.min(1, 1 - (ankleDiffNormalized * 1.8 + hipDiffNormalized * 1.1)));
+            const minFootSync = isChild ? 0.45 : 0.70;
+            const footSyncPass = footSyncScore >= minFootSync;
 
-            // Gate 3: Wrist Rope-Swing Symmetry
+            // Gate 3: Wrist Rope-Swing Symmetry (兒童手臂協調尚在發展，放寬手部限制)
             const wristHeightDiff = Math.abs(lWrist.y - rWrist.y) / torsoLength;
-            const wristSymmetryPass = wristHeightDiff < 0.42;
+            const maxWristDiff = isChild ? 0.85 : 0.42;
+            const wristSymmetryPass = wristHeightDiff < maxWristDiff;
 
             state.gaitStatus.horizontalSpeedRatio = horizSpeedRatio;
             state.gaitStatus.horizontalPass = horizontalPass;
@@ -2424,22 +2446,33 @@
             state.gaitStatus.footSyncPass = footSyncPass;
             state.gaitStatus.wristSymmetryPass = wristSymmetryPass;
 
-            const trackedY = state.trackingMode === 'ankles' ? ankleCenterY : (shoulderCenterY * 0.4 + hipCenterY * 0.6);
+            // 雙點屈膝收腿融合追蹤 (Dual-Point Core + Ankle Tuck Tracking)
+            const coreY = shoulderCenterY * 0.4 + hipCenterY * 0.6;
+            const ankleY = ankleCenterY;
 
-            if (state.baselineY === null) {
-                state.baselineY = trackedY;
-            }
+            if (state.baselineY === null) state.baselineY = coreY;
+            if (state.baselineAnkleY === null) state.baselineAnkleY = ankleY;
 
-            const rawDisplacement = state.baselineY - trackedY;
-            const normalizedDelta = rawDisplacement / torsoLength;
+            const coreDisplacement = state.baselineY - coreY;
+            const ankleDisplacement = state.baselineAnkleY - ankleY;
 
+            const coreDelta = coreDisplacement / torsoLength;
+            const ankleDelta = ankleDisplacement / torsoLength;
+
+            // 核心與腳踝加權融合：成人主要看質心，兒童模式強化腳踝抬起（收小腿屈膝跳）
+            const ankleWeight = isChild ? 0.88 : 0.70;
+            const normalizedDelta = Math.max(coreDelta, ankleDelta * ankleWeight);
+            const trackedY = coreY;
+
+            // 地面待機基準線平滑更新
             if (state.jumpStage === 'GROUNDED' && Math.abs(normalizedDelta) < state.thresholdRatio * 0.6 && horizontalPass) {
-                state.baselineY = state.baselineY * 0.96 + trackedY * 0.04;
+                state.baselineY = state.baselineY * 0.96 + coreY * 0.04;
+                state.baselineAnkleY = state.baselineAnkleY * 0.96 + ankleY * 0.04;
             }
 
             let peakDetected = false;
             const upThreshold = state.thresholdRatio;
-            const downThreshold = state.thresholdRatio * 0.42;
+            const downThreshold = state.thresholdRatio * (isChild ? 0.38 : 0.42);
 
             if (state.isCounting) {
                 if (state.jumpStage === 'GROUNDED') {
@@ -2456,7 +2489,7 @@
                         }
                     }
                 } else if (state.jumpStage === 'AIRBORNE') {
-                    if (!horizontalPass || !footSyncPass) {
+                    if (!horizontalPass || (!footSyncPass && !isChild)) {
                         state.jumpStage = 'GROUNDED';
                         state.currentPeakDelta = 0;
                         registerRejectedWalkEvent(!horizontalPass ? '空中橫移過大 (走路/跨步)' : '左右腳不同步 (踏步)');
@@ -2467,7 +2500,8 @@
                         if (normalizedDelta < downThreshold) {
                             const airtimeMs = now - state.airborneStartTimestamp;
                             state.gaitStatus.airtimeMs = Math.round(airtimeMs);
-                            const airtimePass = airtimeMs >= 95 && airtimeMs <= 720;
+                            const minAirtime = isChild ? 80 : 95;
+                            const airtimePass = airtimeMs >= minAirtime && airtimeMs <= 760;
                             state.gaitStatus.airtimePass = airtimePass;
 
                             if (airtimePass && (now - state.lastJumpTimestamp >= state.minJumpIntervalMs)) {
@@ -3063,9 +3097,78 @@
 
         function recalibrateBaseline() {
             state.baselineY = null;
+            state.baselineAnkleY = null;
             state.jumpStage = 'GROUNDED';
             state.prevHipCenterX = null;
         }
+        function toggleSensitivityMode(targetMode = null) {
+            if (targetMode) {
+                state.sensitivityMode = targetMode;
+            } else {
+                state.sensitivityMode = state.sensitivityMode === 'child' ? 'adult' : 'child';
+            }
+
+            const isChild = state.sensitivityMode === 'child';
+            if (isChild) {
+                state.thresholdRatio = 0.07;
+                state.antiWalkMaxHorizSpeed = 0.24;
+                state.minJumpIntervalMs = 160;
+            } else {
+                state.thresholdRatio = 0.12;
+                state.antiWalkMaxHorizSpeed = 0.14;
+                state.minJumpIntervalMs = 210;
+            }
+
+            recalibrateBaseline();
+            updateSensitivityModeUI();
+            savePersistentState();
+
+            if (isChild) {
+                showToast('👶 已切換為【兒童敏捷模式】：起跳門檻降至 7%、啟用屈膝收腿雙點追蹤、防誤判寬鬆！');
+            } else {
+                showToast('🏋️ 已切換為【成人標準模式】：起跳門檻 12%、標準防作弊生物力學！');
+            }
+        }
+
+        function updateSensitivityModeUI() {
+            const isChild = state.sensitivityMode === 'child';
+            const btn = document.getElementById('btnSensitivityMode');
+            const icon = document.getElementById('iconSensitivityMode');
+            const text = document.getElementById('textSensitivityMode');
+
+            if (btn) {
+                if (isChild) {
+                    btn.className = 'px-2 py-0.5 rounded-lg bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/50 text-[11px] font-bold flex items-center gap-1 transition shadow shadow-neon-cyan/15';
+                    if (icon) icon.textContent = '👶';
+                    if (text) text.textContent = '兒童敏捷';
+                } else {
+                    btn.className = 'px-2 py-0.5 rounded-lg bg-surface-800 hover:bg-surface-700 border border-slate-700 text-slate-300 text-[11px] font-bold flex items-center gap-1 transition shadow';
+                    if (icon) icon.textContent = '🏋️';
+                    if (text) text.textContent = '成人標準';
+                }
+            }
+
+            const hudBadge = document.getElementById('hudSensitivityBadge');
+            if (hudBadge) {
+                hudBadge.textContent = isChild ? '👶 兒童' : '🏋️ 標準';
+                hudBadge.className = isChild
+                    ? 'hidden sm:flex px-2 py-1 rounded-xl bg-neon-cyan/25 border border-neon-cyan/50 text-[11px] font-mono text-neon-cyan font-bold shadow'
+                    : 'hidden sm:flex px-2 py-1 rounded-xl bg-black/80 border border-white/10 text-[11px] font-mono text-slate-300 shadow';
+            }
+
+            const sliderThresh = document.getElementById('sliderThreshold');
+            const labelThresh = document.getElementById('labelThreshold');
+            if (sliderThresh) sliderThresh.value = Math.round(state.thresholdRatio * 100);
+            if (labelThresh) labelThresh.textContent = `${Math.round(state.thresholdRatio * 100)}%`;
+
+            const sliderAnti = document.getElementById('sliderAntiWalk');
+            const labelAnti = document.getElementById('labelAntiWalkStrictness');
+            if (sliderAnti) sliderAnti.value = Math.round(state.antiWalkMaxHorizSpeed * 100);
+            if (labelAnti) {
+                labelAnti.textContent = `${isChild ? '兒童寬鬆' : '標準'} (${Math.round(state.antiWalkMaxHorizSpeed * 100)}%)`;
+            }
+        }
+
 
         function updateThresholdParam(val) {
             const num = parseInt(val, 10);
@@ -3120,6 +3223,7 @@
             if (stageNum === 1) {
                 state.onboardingStage = 1;
             updateStepperHeaderUI();
+            updateSensitivityModeUI();
             // 自動啟動鏡頭串流
             startWebcamStream();
                 openStage1WizardModal();
